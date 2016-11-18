@@ -4,6 +4,10 @@
 
 GL_DEFINE_SINGLETON(PHO_PahtTracer);
 
+PHO_PahtTracer::~PHO_PahtTracer(){
+	Clear();
+}
+
 void PHO_PahtTracer::Clear(){
 	m_ViewPort = nullptr;
 	SAFERELEASE(m_RetBMP);

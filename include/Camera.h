@@ -1,5 +1,5 @@
-#ifndef Camera
-#define Camera_
+#ifndef Camera_H
+#define Camera_H
 //#include<iostream>
 //#include"Constructs/Vec3f.h"
 #include<glm\vec3.hpp>

@@ -11,12 +11,16 @@ public:
 	~PHO_Random(){};
 	void SetSeed(unsigned short *);
 
+	double GetDouble();
+	long GetLong();
+
+	void lcong48(unsigned short p[7]);
 private:
 	unsigned short m_rand48_seed[3];
-	unsigned short _rand48_mult[3];
-	unsigned short _rand48_add;
+	unsigned short m_rand48_mult[3];
+	unsigned short m_rand48_add;
 
-	double drand48();
+
 
 private:
 
@@ -42,7 +46,7 @@ private:
 
 	unsigned short * seed48(unsigned short xseed[3]);
 
-	void lcong48(unsigned short p[7]);
+
 
 
 };
