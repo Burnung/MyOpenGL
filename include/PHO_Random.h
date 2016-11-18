@@ -3,11 +3,14 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include"gl_util.h"
 
 class PHO_Random{
 
+	GL_DECLARE_SINGLETON(PHO_Random);
+
 public:
-	PHO_Random();
+	void Init();
 	~PHO_Random(){};
 	void SetSeed(unsigned short *);
 

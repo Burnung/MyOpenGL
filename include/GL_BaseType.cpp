@@ -177,3 +177,11 @@ void Triangle::ComVertex(float u, float v, Vertex &ret){
 	ret.normal = m_p1.normal * w + m_p2.normal * u + m_p3.normal * v;
 	ret.pos = m_p1.pos * w + m_p2.pos * u + m_p3.pos * v;
 }
+
+GL_ObjIntersection& GL_ObjIntersection::operator = (GL_ObjIntersection& tmp){
+	this->m_Dis = tmp.m_Dis;
+	this->m_IsHit = tmp.m_IsHit;
+	this->m_Material = tmp.m_Material;
+	this->m_Vertex = tmp.m_Vertex;
+	return *this;
+}

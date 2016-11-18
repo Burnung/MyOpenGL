@@ -15,7 +15,7 @@ typedef unsigned char       BYTE;
 	static CLASS_NAME &Instance()
 //¶¨Òåµ¥Àýºê
 #define GL_DEFINE_SINGLETON(CLASS_NAME)   \
-	CLASS_NAME::CLASS_NAME(){};  \
+	CLASS_NAME::CLASS_NAME() {};  \
 	CLASS_NAME & CLASS_NAME::Instance(){\
 	static CLASS_NAME s_instance; \
 	return s_instance;\
@@ -66,5 +66,15 @@ enum MaterialType{
 	EMIT,
 	MIX,
 };
+
+template<typename T>
+void PHO_Camp(T Tmin, T Tmax, T& var){
+	if (var < Tmin)
+		var = Tmin;
+	else if (var > Tmin)
+		var = Tmax;
+}
+
+
 
 #endif

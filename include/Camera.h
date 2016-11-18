@@ -81,6 +81,14 @@ public:
 	void SetLookVec(glm::vec3& LV);
 	void SetUpVec(glm::vec3& up);
 
+	glm::vec3 GetLookvec(){
+		return NtargetVec;
+	}
+
+	glm::vec3 GetUpvec(){
+		return NupVec;
+	}
+
 	glm::vec3 getPosition(){
 		return Nposition;
 	}

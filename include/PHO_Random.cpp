@@ -8,7 +8,10 @@
 #define RAND48_MULT_2   (0x0005)
 #define RAND48_ADD      (0x000b)
 
-PHO_Random::PHO_Random(){
+
+GL_DEFINE_SINGLETON(PHO_Random);
+
+void PHO_Random::Init(){
 	m_rand48_seed[0] = RAND48_SEED_0;
 	m_rand48_seed[1] = RAND48_SEED_1;
 	m_rand48_seed[2] = RAND48_SEED_2;
@@ -20,7 +23,10 @@ PHO_Random::PHO_Random(){
 	m_rand48_add = RAND48_ADD;
 
 }
-
+void PHO_Random::SetSeed(unsigned short* Tseed){
+	for (int i = 0; i < 3; i++)
+		m_rand48_seed[i] = Tseed[i];
+}
 
 void PHO_Random::_dorand48(unsigned short xseed[3])
 {

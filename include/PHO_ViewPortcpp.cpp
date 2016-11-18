@@ -32,7 +32,7 @@ void PHO_ViewPort::SetNearAndFar(float n, float f){
 	m_ViewPortChange = true;
 }
 void PHO_ViewPort::SetFovy(float f){
-	m_Fovy = f;
+	m_Fovy = glm::radians(f);
 	m_ViewPortChange = true;
 }
 void PHO_ViewPort::SetCameraPos(glm::vec3& p){
@@ -79,4 +79,13 @@ glm::mat4 PHO_ViewPort::GetProViewMat(){
 	tmpProMat = GetProMat();
 	m_ProViewMat = tmpProMat * tmpView;
 	return m_ProViewMat;
+}
+glm::vec3 PHO_ViewPort::GetCameraPos(){
+	return m_Camera->getPosition();
+}
+glm::vec3 PHO_ViewPort::GetCameraLookVec(){
+	return m_Camera->GetLookvec();
+}
+glm::vec3 PHO_ViewPort::GetCameraUpVec(){
+	return m_Camera->GetUpvec();
 }

@@ -42,6 +42,7 @@ struct GL_ObjIntersection{
 	GL_ObjIntersection();
 
 	GL_ObjIntersection(bool ,Vertex&, GL_Material&, float);
+	GL_ObjIntersection& operator= (GL_ObjIntersection&);
 };
 
 struct AABB_Box{

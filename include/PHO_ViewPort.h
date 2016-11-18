@@ -26,9 +26,10 @@ public:
 	int GetHeight(){ return m_Height; };
 	float GetNear(){ return m_Nearest; };
 	float GetFar() { return m_Farthest; };
+	float GetFovy() { return m_Fovy; };
 	glm::vec3 GetCameraPos();
 	glm::vec3 GetCameraLookVec();
-	glm::vec3 GetCameraUpvec();
+	glm::vec3 GetCameraUpVec();
 
 	glm::mat4 GetProMat();
 	glm::mat4 GetViewMat();

@@ -50,3 +50,19 @@ void GL_Scene::Render(){
 		item->Render();
 	}
 }
+GL_ObjIntersection GL_Scene::Intersect(GL_Ray &ray){
+	GL_ObjIntersection ret_its = GL_ObjIntersection();
+	GL_ObjIntersection tmp;
+	for (auto item : m_Objects){
+		GL_ObjIntersection tmp;
+		item->InterSect(ray, tmp, ret_its.m_Dis);
+		if (tmp.m_IsHit && tmp.m_Dis < ret_its.m_Dis)
+			ret_its = tmp;
+	}
+	return ret_its;
+}
+
+glm::vec3 GL_Scene::GoTrace(GL_Ray &ray){
+	GL_ObjIntersection myInter =  Intersect(ray);
+	return glm::vec3(0, 0, 0);
+}
