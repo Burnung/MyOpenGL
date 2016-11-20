@@ -4,7 +4,7 @@
 #include <time.h>
 
 typedef unsigned char       BYTE;
-
+const float PI = 3.1415926;
 //ÉùÃ÷µ¥Àýºê
 #define GL_DECLARE_SINGLETON(CLASS_NAME)  \
 	private:\
@@ -68,7 +68,7 @@ enum MaterialType{
 };
 
 template<typename T>
-void PHO_Camp(T Tmin, T Tmax, T& var){
+void PHO_Clamp(T Tmin, T Tmax, T& var){
 	if (var < Tmin)
 		var = Tmin;
 	else if (var > Tmin)

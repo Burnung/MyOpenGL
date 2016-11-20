@@ -1,4 +1,4 @@
-#version 440
+#version 450
 
 in layout (location = 0) vec3 Nor;
 in layout (location = 1) vec2 Uv;

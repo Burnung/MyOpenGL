@@ -15,7 +15,7 @@ public:
 	bool addModel(std::string &filnema,bool kdTree =false);
 	bool addSphereObj(glm::vec3 &Center, float raduis);
 	void Render();
-	glm::vec3 GoTrace(GL_Ray &ray);
+	glm::vec3 GoTrace(GL_Ray &ray,int depth = 0);
 private:
 	//Camera m_Camera;
 	ObjeceVes m_Objects;

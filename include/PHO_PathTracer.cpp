@@ -3,6 +3,7 @@
 #include"GL_Scene.h"
 #include"GL_Scene.h"
 
+const int PATHTRACER_MAX_DEPTH = 10;
 GL_DEFINE_SINGLETON(PHO_PahtTracer);
 
 PHO_PahtTracer::~PHO_PahtTracer(){
@@ -61,9 +62,9 @@ GL_Ray PHO_PahtTracer::GetRay(int x,int y){
 	x_jatter = PHO_Random::Instance().GetDouble() * m_X_Spacing - m_X_Spacing_Half;
 	y_jatter = PHO_Random::Instance().GetDouble() * m_Y_Spacing - m_Y_Spacing_Half;
 
-	vec3 XOffset = (2.0f * x * m_Width_recp * m_Ratio + x_jatter) * m_CamXVec - m_CamXVec * m_Ratio;
-	vec3 YOffset = (2.0f * y * m_Height_recp + y_jatter) * m_CamYVec - m_CamYVec;
-	vec3 RetVec = glm::normalize(m_FovS * m_CamTarVec + XOffset + YOffset);
+	glm::vec3 XOffset = (2.0f * x * m_Width_recp * m_Ratio + x_jatter) * m_CamXVec - m_CamXVec * m_Ratio;
+	glm::vec3 YOffset = (2.0f * y * m_Height_recp + y_jatter) * m_CamYVec - m_CamYVec;
+	glm::vec3 RetVec = glm::normalize(m_FovS * m_CamTarVec + XOffset + YOffset);
 	
 	return GL_Ray(m_CamPos, RetVec);
 
@@ -73,7 +74,7 @@ void PHO_PahtTracer::WriteColor(glm::vec3 &col, int x, int y){
 		return;
 	int Tpos = (y * m_WindowWidth + x) * 3;
 	for (int i = 0; i < 3; i++){
-		PHO_Camp(0.0f, 1.0f, col[i]);
+		PHO_Clamp(0.0f, 1.0f, col[i]);
 		m_RetBMP[Tpos + i] = col[i] * 255;
 	}
 }
@@ -111,4 +112,8 @@ void PHO_PahtTracer::GoTrace(int samples){
 
 #endif
 
+}
+
+int PHO_PahtTracer::GetMaxDepth(){
+	return PATHTRACER_MAX_DEPTH;
 }

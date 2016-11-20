@@ -16,7 +16,7 @@ const int MARGIN = 10;
 
 const float AngleStep = 5;
 
-const float PI = 3.1415926;
+
 
 class Camera{
 

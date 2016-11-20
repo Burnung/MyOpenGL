@@ -21,6 +21,8 @@ public:
 
 	void Update();
 
+	int GetMaxDepth();
+
 private:
 	PHO_ViewPort *m_ViewPort;
 
