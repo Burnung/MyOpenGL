@@ -10,6 +10,10 @@
 #include<GL_Shader.h>
 #include<GL_Blend.h>
 #include<GL_Scene.h>
+#include<PHO_ViewPort.h>
+#include<PHO_Random.h>
+#include<PHO_ViewPort.h>
+#include<PHO_PathTracer.h>
 
 const int WINDOWWIDTH = 512;
 const int WINDOWHEIGHT = 512;
@@ -46,7 +50,26 @@ public:
 	}
 
 	void Init(){
-		m_Shader.loadShader("shader/Model.vert", nullptr, "shader/Model.frag");
+		SAFERELEASE(m_ViewPort);
+		m_ViewPort = new PHO_ViewPort();
+		m_ViewPort->SetCameraPos(glm::vec3(50, 52, 295));
+		m_ViewPort->SetCameraLookvec(glm::vec3(0, -0.042612, -1));
+		m_ViewPort->SetCameraUpVec(glm::vec3(0, 1.0f, 0));
+		m_ViewPort->InitCamera();
+		PHO_Random::Instance().Init();
+		PHO_PahtTracer::Instance().Init(m_ViewPort);
+		SphereObj spheres[] = {//Scene: radius, position, emission, color, material
+			SphereObj(1e5, glm::vec3(1e5 + 1, 40.8, 81.6), GL_Material( Vec(), Vec(.75, .25, .25), DIFF),//Left
+			SphereObj(1e5, glm::vec3(-1e5 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
+			SphereObj(1e5, glm::vec3(50, 40.8, 1e5), Vec(), Vec(.75, .75, .75), DIFF),//Back
+			SphereObj(1e5, glm::vec3(50, 40.8, -1e5 + 170), Vec(), Vec(), DIFF),//Frnt
+			SphereObj(1e5, glm::vec3(50, 1e5, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Botm
+			SphereObj(1e5, glm::vec3(50, -1e5 + 81.6, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Top
+			SphereObj(16.5, glm::vec3(27, 16.5, 47), Vec(), Vec(1, 1, 1)*.999, SPEC),//Mirr
+			SphereObj(16.5, glm::vec3(73, 16.5, 78), Vec(), Vec(1, 1, 1)*.999, REFR),//Glas
+			SphereObj(1.5, glm::vec3(50, 81.6 - 16.5, 81.6), Vec(4, 4, 4) * 100, Vec(), DIFF),//Lite
+		};
+		/*m_Shader.loadShader("shader/Model.vert", nullptr, "shader/Model.frag");
 		//m_Camera = Camera()
 		ERROROUT("main.cpp is ok");
 		m_Blend.Init(WINDOWWIDTH, WINDOWHEIGHT, 40);
@@ -61,7 +84,7 @@ public:
 		m_TexLocation = m_Shader.getUniform("gColorMap");
 		m_Shader.DisUse();
 
-		ProMat = glm::perspective(glm::radians(60.0f), WINDOWWIDTH /(1.0f * WINDOWHEIGHT), 0.1f, 1000.0f);
+		ProMat = glm::perspective(glm::radians(60.0f), WINDOWWIDTH /(1.0f * WINDOWHEIGHT), 0.1f, 1000.0f);*/
 		
 	}
 
@@ -110,6 +133,7 @@ private:
 	GLuint m_MVPLocation;
 	GLuint m_TexLocation;
 	glm::mat4 ProMat;
+	PHO_ViewPort *m_ViewPort;
 
 };
 
@@ -120,7 +144,7 @@ int main(){
 	InitGLContex(WINDOWWIDTH, WINDOWHEIGHT, true, false, "test");
 	myApp *App = new myApp;
 	App->Init();
-	App->Run();
+	//App->Run();
 
 	ENDERROROUT();
 	//while (1);

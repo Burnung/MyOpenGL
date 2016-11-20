@@ -226,15 +226,19 @@ void Model::SetMaterial(GL_Material &Tmat){
 	}
 }
 
-SphereObj::SphereObj(){
+SphereObj::SphereObj() : m_Mat(nullptr), m_Raduis(0,0f){
 	//m_Mat = new GL_Material();
 }
-
+SphereObj::SphereObj(float r, glm::vec3 &pos, GL_Material &mat){
+	m_Raduis = r;
+	setPos(pos);
+	m_Mat = new GL_Material(mat);
+}
 SphereObj::~SphereObj(){
 	SAFERELEASE(m_Mat);
 }
 
-void SphereObj::Init(glm::vec3 &pos, float r,GL_Material &mat){
+void SphereObj::Init(float r, glm::vec3 &pos, GL_Material &mat){
 	m_Raduis = r;
 	setPos(pos);
 	SAFERELEASE(m_Mat);

@@ -145,8 +145,8 @@ void Fbo::SaveBuffToBMP(const char *fileName, int id){
 
 }
 
-
 #define WIDTHBYTES(bits)    (((bits) + 31) / 32 * 4)
+
 void Fbo::SaveBMP(const char *fileName, BYTE *buf, UINT width, UINT height){
 
 	short res1 = 0;
@@ -161,48 +161,48 @@ void Fbo::SaveBMP(const char *fileName, BYTE *buf, UINT width, UINT height){
 
 	DWORD widthDW = WIDTHBYTES(width * 24);
 
-	long bmfsize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + widthDW * height;	
+	long bmfsize = sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+widthDW * height;
 	long byteswritten = 0;
 
 	BITMAPINFOHEADER header;
-	header.biSize = 40; 						
+	header.biSize = 40;
 	header.biWidth = width;
 	header.biHeight = height;
 	header.biPlanes = 1;
-	header.biBitCount = 24;					
-	header.biCompression = BI_RGB;			
+	header.biBitCount = 24;
+	header.biCompression = BI_RGB;
 	header.biSizeImage = 0;
 	header.biXPelsPerMeter = 0;
 	header.biYPelsPerMeter = 0;
 	header.biClrUsed = 0;
 	header.biClrImportant = 0;
 
-	FILE* fp;	
-    fopen_s(&fp,fileName, "wb");
+	FILE* fp;
+	fopen_s(&fp, fileName, "wb");
 	if (fp == NULL)
 	{
 		return;
 	}
 
-	BYTE* topdown_pixel = (BYTE*)malloc( width * height * 3 * sizeof(BYTE) );
+	BYTE* topdown_pixel = (BYTE*)malloc(width * height * 3 * sizeof(BYTE));
 
-	for(unsigned int j = 0; j < height; j++)
-		for(unsigned int k = 0; k < width; k++)
-		{
-			memcpy( &topdown_pixel[(j*width+k)*3], &buf[(j*width+k)*3+2], sizeof(BYTE) );
-			memcpy( &topdown_pixel[(j*width+k)*3+2], &buf[(j*width+k)*3], sizeof(BYTE) );
-			memcpy( &topdown_pixel[(j*width+k)*3+1], &buf[(j*width+k)*3+1], sizeof(BYTE) );
-		}
+	for (unsigned int j = 0; j < height; j++)
+	for (unsigned int k = 0; k < width; k++)
+	{
+		memcpy(&topdown_pixel[(j*width + k) * 3], &buf[(j*width + k) * 3 + 2], sizeof(BYTE));
+		memcpy(&topdown_pixel[(j*width + k) * 3 + 2], &buf[(j*width + k) * 3], sizeof(BYTE));
+		memcpy(&topdown_pixel[(j*width + k) * 3 + 1], &buf[(j*width + k) * 3 + 1], sizeof(BYTE));
+	}
 
 	buf = topdown_pixel;
 
 	// Ìî³äBITMAPFILEHEADER
 	fwrite((BYTE*)&(m1), 1, 1, fp); byteswritten += 1;
 	fwrite((BYTE*)&(m2), 1, 1, fp); byteswritten += 1;
-	fwrite((long*)&(bmfsize), 4, 1,fp);	byteswritten += 4;
+	fwrite((long*)&(bmfsize), 4, 1, fp);	byteswritten += 4;
 	fwrite((int*)&(res1), 2, 1, fp); byteswritten += 2;
 	fwrite((int*)&(res2), 2, 1, fp); byteswritten += 2;
-	fwrite((long*)&(pixoff), 4, 1,fp); byteswritten += 4;
+	fwrite((long*)&(pixoff), 4, 1, fp); byteswritten += 4;
 
 	// Ìî³äBITMAPINFOHEADER
 	fwrite((BITMAPINFOHEADER*)&header, sizeof(BITMAPINFOHEADER), 1, fp);
@@ -217,28 +217,27 @@ void Fbo::SaveBMP(const char *fileName, BYTE *buf, UINT width, UINT height){
 
 	for (row = 0; row < header.biHeight; row++)
 	{
-		rowidx = (long unsigned)row * row_size;						      
+		rowidx = (long unsigned)row * row_size;
 
 		// Ð´Ò»ÐÐ
 		rc = fwrite((void*)(buf + rowidx), row_size, 1, fp);
-		if (rc != 1) 
+		if (rc != 1)
 		{
 			break;
 		}
-		byteswritten += row_size;	
+		byteswritten += row_size;
 
-		for (DWORD count = row_size; count < widthDW; count++) 
+		for (DWORD count = row_size; count < widthDW; count++)
 		{
-			char dummy=0;
+			char dummy = 0;
 			fwrite(&dummy, 1, 1, fp);
-			byteswritten++;							  
+			byteswritten++;
 		}
 
 	}
 
 	fclose(fp);
 }
-
 
 void Fbo::SaveFloat(const char *fileName, int id){
 	float *pFloat = NULL;

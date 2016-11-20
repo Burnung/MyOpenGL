@@ -114,6 +114,10 @@ void PHO_PahtTracer::GoTrace(int samples){
 
 }
 
+void PHO_PahtTracer::Save2BMP(const char* filename){
+	SaveBMP(filename, m_RetBMP, m_WindowWidth, m_WindowHeight);
+}
+
 int PHO_PahtTracer::GetMaxDepth(){
 	return PATHTRACER_MAX_DEPTH;
 }

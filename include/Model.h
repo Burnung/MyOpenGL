@@ -29,8 +29,9 @@ private:
 class SphereObj :public Object{
 public:
 	SphereObj();
+	SphereObj(float r, glm::vec3 &pos, GL_Material &mat);
 	virtual ~SphereObj();
-	void Init(glm::vec3 &pos, float r,GL_Material &mat);
+	void Init(float r, glm::vec3 &pos, GL_Material &mat);
 	virtual bool InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &dmin);
 	//virtual void Render();
 

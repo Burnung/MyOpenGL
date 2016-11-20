@@ -45,7 +45,7 @@ void GetTime(std::ofstream &);
 void EndErrorOut();
 void GlfwErrorCallBack(int n, const char* descrption);
 bool ReadFile(const char* pFileName, std::string& outFile);
-
+void SaveBMP(const char *fileName, BYTE *buf, int width, int height);
 
 #define GL_INVALID_MATERIAL 0xFFFFFFFF
 #define INVALID_OGL_VALUE   0xFFFFFFFF

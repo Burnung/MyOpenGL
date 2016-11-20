@@ -23,6 +23,8 @@ public:
 
 	int GetMaxDepth();
 
+	void Save2BMP(const char* filename );
+
 private:
 	PHO_ViewPort *m_ViewPort;
 
