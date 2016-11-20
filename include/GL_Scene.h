@@ -13,7 +13,7 @@ public:
 	~GL_Scene();
 	void addObject(Object*);
 	bool addModel(std::string &filnema,bool kdTree =false);
-	bool addSphereObj(glm::vec3 &Center, float raduis);
+	bool addSphereObj(glm::vec3 &Center, float raduis, GL_Material&);
 	void Render();
 	glm::vec3 GoTrace(GL_Ray &ray,int depth = 0);
 private:

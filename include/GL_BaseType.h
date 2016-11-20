@@ -113,6 +113,7 @@ public:
 	GL_Texture *m_PTexture;
 	GL_Material(RenderType RenderType = TEXTURE_TYPE, MaterialType MatType = DIFF);
 	GL_Material(GL_Material&);
+	GL_Material& operator= (GL_Material&);
 	bool LoadTexture(GLenum, std::string&);
 
 };

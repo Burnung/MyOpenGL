@@ -32,13 +32,13 @@ bool GL_Scene::addModel(std::string &filename, bool kdTree){
 	addObject(newModel);
 }
 
-bool GL_Scene::addSphereObj(glm::vec3 &center, float raduis){
+bool GL_Scene::addSphereObj(glm::vec3 &center, float raduis,GL_Material &mat){
 	SphereObj *tmpSphere = new SphereObj;
 	if (tmpSphere == nullptr){
 		ERROROUT("error to creat sphere");
 		return false;
 	}
-	tmpSphere->Init(center, raduis);
+	tmpSphere->Init(center, raduis, mat);
 	addObject(tmpSphere);
 		
 }

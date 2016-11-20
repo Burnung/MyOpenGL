@@ -2,6 +2,13 @@
 #include"gl_util.h"
 #include<iostream>
 
+
+Model::Model() :m_kdTree(nullptr), m_WholeMaterial(nullptr), IsSameMat(false){
+	m_Entities.clear();
+	m_Materials.clear();
+	m_Triangles.clear();
+}
+
 Model::~Model(){
 	Clear();
 }
@@ -198,6 +205,7 @@ bool Model::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float &dmin)
 		return false;
 	return m_kdTree->InterSect(ray, intersection, dmin);
 }
+
 Model::ModelEntity::ModelEntity()
 {
 	Vb = INVALID_OGL_VALUE;
@@ -207,11 +215,30 @@ Model::ModelEntity::ModelEntity()
 	MaterialIndex = GL_INVALID_MATERIAL;
 };
 
+void Model::SetMaterial(GL_Material &Tmat){
+	SAFERELEASE(m_WholeMaterial);
+	m_WholeMaterial = new GL_Material(Tmat);
+	IsSameMat = true;
 
-void SphereObj::Init(glm::vec3 &pos, float r){
+	if (IskdTree){
+		for (auto item : m_Triangles)
+			item->m_PMaterial = m_WholeMaterial;
+	}
+}
 
+SphereObj::SphereObj(){
+	//m_Mat = new GL_Material();
+}
+
+SphereObj::~SphereObj(){
+	SAFERELEASE(m_Mat);
+}
+
+void SphereObj::Init(glm::vec3 &pos, float r,GL_Material &mat){
 	m_Raduis = r;
 	setPos(pos);
+	SAFERELEASE(m_Mat);
+	m_Mat = new GL_Material(mat);
 }
 
 bool SphereObj::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &dmin){
@@ -223,5 +250,11 @@ bool SphereObj::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &
 	intersection.m_Dis = Dis;
 	intersection.m_IsHit = true;
 	dmin = Dis;
+	intersection.m_Material = m_Mat;
+	glm::vec3 tpos = Dis * ray.m_Dirction + ray.m_Origin;
+	glm::vec3 tnormal = tpos - getPos();
+	Vertex tVer(tpos, tnormal,glm::vec2(0,0));
+	intersection.m_Vertex = tVer;
+
 	return true;
 }

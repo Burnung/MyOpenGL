@@ -52,7 +52,14 @@ GL_Material::GL_Material(GL_Material& tmpM){
 	this->m_colour = tmpM.m_colour;
 	this->m_emission = tmpM.m_emission;
 }
-
+GL_Material& GL_Material::operator = (GL_Material& tmpM){
+	this->m_RenderType = tmpM.m_RenderType;
+	this->m_MaterialType = tmpM.m_MaterialType;
+	this->m_PTexture = tmpM.m_PTexture;
+	this->m_colour = tmpM.m_colour;
+	this->m_emission = tmpM.m_emission;
+	return *this;
+}
 bool GL_Material::LoadTexture(GLenum TexType, std::string& filename){
 	SAFERELEASE(m_PTexture);
 	m_PTexture = new GL_Texture();

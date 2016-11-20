@@ -17,8 +17,6 @@ class Object{
 public:
 	Object() :m_Postion(0.0f, 0.0f, 0.0f){};
 	virtual ~Object() {};
-	virtual bool LoadFromFile(std::string &filename) { return true; };
-	virtual void Init(glm::vec3 &pos, float r) {  };
 	virtual void Render(){};
 	virtual bool InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float &dmin) { return false; };
 	void setPos(glm::vec3 pos){ m_Postion = pos; };
@@ -30,23 +28,27 @@ private:
 
 class SphereObj :public Object{
 public:
-	virtual ~SphereObj() {};
-	virtual void Init(glm::vec3 &pos, float r);
+	SphereObj();
+	virtual ~SphereObj();
+	void Init(glm::vec3 &pos, float r,GL_Material &mat);
 	virtual bool InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &dmin);
 	//virtual void Render();
 
 	float m_Raduis;  //°ë¾¶
+
+private:
+	GL_Material *m_Mat;
 	
 };
 
 class Model :public  Object{
 public:
-	Model() :m_kdTree(nullptr){};
+	Model();
 	virtual ~Model();
-	virtual bool LoadFromFile(std::string &FileName, bool kdTree =false);
+	bool LoadFromFile(std::string &FileName, bool kdTree =false);
 	virtual void Render();
 	virtual bool InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &dmin);
-
+	void SetMaterial(GL_Material &Tmat);
 	struct ModelEntity{
 
 		GLuint Vb, Ib;
@@ -66,6 +68,7 @@ private:
 	std::vector<GL_Material*> m_Materials;
 	std::vector<ModelEntity> m_Entities;
 	std::vector<Triangle*> m_Triangles;
+	GL_Material *m_WholeMaterial;
 
 	void Clear();
 	bool InitFromScene(const aiScene *m_Scene,std::string &filename);
@@ -74,6 +77,7 @@ private:
 	bool BuildTriangles();
 	GL_kdTree *m_kdTree;
 	bool IskdTree;
+	bool IsSameMat;
 
 };
 
