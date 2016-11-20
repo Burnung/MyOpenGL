@@ -63,8 +63,8 @@ enum RenderType{
 enum MaterialType{
 	DIFF,
 	SPEC,
-	EMIT,
-	MIX,
+	REFR,
+	NUM,
 };
 
 template<typename T>

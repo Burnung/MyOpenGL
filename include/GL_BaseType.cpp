@@ -41,7 +41,8 @@ void GL_Texture::Bind(GLenum TextureUnit){
 
 GL_Material::GL_Material(RenderType RenderType, MaterialType MatType) :m_RenderType(RenderType), m_MaterialType(MatType)
 , m_PTexture(nullptr),m_colour(0.5f,0.5f,0.5f),m_emission(0.2f,0.2f,0.2f){
-
+	if (m_MaterialType == MaterialType::REFR)
+		m_Refra = 1.5f;     //ø’∆¯…‰»ÎΩÈ÷ 
 }
 
 GL_Material::GL_Material(GL_Material& tmpM){

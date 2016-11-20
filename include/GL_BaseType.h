@@ -106,7 +106,7 @@ class GL_Material{
 public:
 	RenderType m_RenderType;
 	MaterialType m_MaterialType;
-
+	float m_Refra;  //折射率  大于等于1
 	glm::vec3 m_colour;
 	glm::vec3 m_emission;
 
