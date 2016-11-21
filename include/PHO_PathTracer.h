@@ -48,6 +48,7 @@ private:
 
 
 private:
+	void ClearRetBuffer();
 	void Clear();
 	GL_Ray GetRay(int x,int y);
 	void WriteColor(glm::vec3 &col, int x, int y);

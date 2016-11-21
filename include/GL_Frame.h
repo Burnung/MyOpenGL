@@ -25,6 +25,9 @@ public:
 };
 
 class GL_App{
+public:
+	virtual ~GL_App(){};
+
 protected:
 	GL_App();
 

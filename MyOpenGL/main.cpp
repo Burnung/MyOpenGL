@@ -23,6 +23,9 @@ using namespace std;
 
 class myApp :public GL_CallBack, public GL_App{
 public:
+	virtual ~myApp(){
+		SAFERELEASE(m_ViewPort);
+	}
 	virtual void RenderScene(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -50,7 +53,8 @@ public:
 	}
 
 	void Init(){
-		SAFERELEASE(m_ViewPort);
+
+		//SAFERELEASE(m_ViewPort);
 		m_ViewPort = new PHO_ViewPort();
 		m_ViewPort->SetCameraPos(glm::vec3(50, 52, 295));
 		m_ViewPort->SetCameraLookvec(glm::vec3(0, -0.042612, -1));
@@ -58,17 +62,22 @@ public:
 		m_ViewPort->InitCamera();
 		PHO_Random::Instance().Init();
 		PHO_PahtTracer::Instance().Init(m_ViewPort);
-		SphereObj spheres[] = {//Scene: radius, position, emission, color, material
-			SphereObj(1e5, glm::vec3(1e5 + 1, 40.8, 81.6), GL_Material( Vec(), Vec(.75, .25, .25), DIFF),//Left
-			SphereObj(1e5, glm::vec3(-1e5 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
-			SphereObj(1e5, glm::vec3(50, 40.8, 1e5), Vec(), Vec(.75, .75, .75), DIFF),//Back
-			SphereObj(1e5, glm::vec3(50, 40.8, -1e5 + 170), Vec(), Vec(), DIFF),//Frnt
-			SphereObj(1e5, glm::vec3(50, 1e5, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Botm
-			SphereObj(1e5, glm::vec3(50, -1e5 + 81.6, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Top
-			SphereObj(16.5, glm::vec3(27, 16.5, 47), Vec(), Vec(1, 1, 1)*.999, SPEC),//Mirr
-			SphereObj(16.5, glm::vec3(73, 16.5, 78), Vec(), Vec(1, 1, 1)*.999, REFR),//Glas
-			SphereObj(1.5, glm::vec3(50, 81.6 - 16.5, 81.6), Vec(4, 4, 4) * 100, Vec(), DIFF),//Lite
+		SphereObj *spheres[] = {//Scene: radius, position, emission, color, material
+			new SphereObj(1e5, glm::vec3(1e5 + 1, 40.8, 81.6), GL_Material(glm::vec3(0, 0, 0), glm::vec3(.75, .25, .25), DIFF)),//Left
+			new SphereObj(1e5, glm::vec3(-1e5 + 99, 40.8, 81.6), GL_Material(glm::vec3(0, 0, 0), glm::vec3(.25, .25, .75), DIFF)),//Rght
+			new SphereObj(1e5, glm::vec3(50, 40.8, 1e5), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Back
+			new SphereObj(1e5, glm::vec3(50, 40.8, -1e5 + 170), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(), DIFF)),//Frnt
+			new SphereObj(1e5, glm::vec3(50, 1e5, 81.6), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Botm
+			new SphereObj(1e5, glm::vec3(50, -1e5 + 81.6, 81.6), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Top
+			new SphereObj(16.5, glm::vec3(27, 16.5, 47), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1, 1, 1)*0.999f, SPEC)),//Mirr
+			new SphereObj(16.5, glm::vec3(73, 16.5, 78), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)*0.999f, REFR)),//Glas
+			new SphereObj(1.5, glm::vec3(50, 81.6 - 16.5, 81.6), GL_Material(glm::vec3(0.9f, 0.9f, 0.9f) , glm::vec3(0.0f,0.0f,0.0f), DIFF)),//Lite
 		};
+		for (auto item : spheres)
+			GL_Scene::Instance().addObject(item);
+
+		PHO_PahtTracer::Instance().GoTrace(1);
+		PHO_PahtTracer::Instance().Save2BMP("pathTracing.bmp");
 		/*m_Shader.loadShader("shader/Model.vert", nullptr, "shader/Model.frag");
 		//m_Camera = Camera()
 		ERROROUT("main.cpp is ok");
@@ -140,13 +149,13 @@ private:
 
 int main(){
 
-	INITEERROROUT("log.txt");
+	//INITEERROROUT("log.txt");
 	InitGLContex(WINDOWWIDTH, WINDOWHEIGHT, true, false, "test");
 	myApp *App = new myApp;
 	App->Init();
 	//App->Run();
 
-	ENDERROROUT();
+	//ENDERROROUT();
 	//while (1);
 
 

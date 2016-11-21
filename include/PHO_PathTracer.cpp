@@ -3,7 +3,7 @@
 #include"GL_Scene.h"
 #include"GL_Scene.h"
 
-const int PATHTRACER_MAX_DEPTH = 10;
+const int PATHTRACER_MAX_DEPTH = 3;
 GL_DEFINE_SINGLETON(PHO_PahtTracer);
 
 PHO_PahtTracer::~PHO_PahtTracer(){
@@ -79,8 +79,14 @@ void PHO_PahtTracer::WriteColor(glm::vec3 &col, int x, int y){
 	}
 }
 
+void PHO_PahtTracer::ClearRetBuffer(){
+	if (m_RetBMP == nullptr)
+		m_RetBMP = new BYTE[m_WindowHeight * m_WindowWidth * 3];
+	memset(m_RetBMP, 0, sizeof(BYTE)* m_WindowHeight * m_WindowWidth * 3);
+}
+
 void PHO_PahtTracer::GoTrace(int samples){
-	SAFERELEASE(m_RetBMP);
+	ClearRetBuffer();
 	if (!m_ViewPort){
 		ERROROUT("Not Set ViewPort");
 		exit(1);

@@ -39,12 +39,15 @@ void GL_Texture::Bind(GLenum TextureUnit){
 	glBindTexture(m_TexType, m_TexId);
 }
 
-GL_Material::GL_Material(MaterialType MatType, RenderType RenderType) :m_RenderType(RenderType), m_MaterialType(MatType)
-, m_PTexture(nullptr),m_colour(0.5f,0.5f,0.5f),m_emission(0.2f,0.2f,0.2f){
+GL_Material::GL_Material(glm::vec3 &emmision, glm::vec3 &color, MaterialType MatType, RenderType RenType) :m_RenderType(RenType), m_MaterialType(MatType)
+, m_PTexture(nullptr), m_colour(color), m_emission(emmision){
 	if (m_MaterialType == MaterialType::REFR)
 		m_Refra = 1.5f;     //¿ÕÆøÉäÈë½éÖÊ
 }
+GL_Material::GL_Material(MaterialType MatType, RenderType RenType) : m_RenderType(RenType), m_MaterialType(MatType)
+, m_PTexture(nullptr), m_colour(0.5f, 0.5f, 0.5f), m_emission(0.2f, 0.2f, 0.2f){
 
+}
 GL_Material::GL_Material(GL_Material& tmpM){
 	this->m_RenderType = tmpM.m_RenderType;
 	this->m_MaterialType = tmpM.m_MaterialType;

@@ -226,7 +226,7 @@ void Model::SetMaterial(GL_Material &Tmat){
 	}
 }
 
-SphereObj::SphereObj() : m_Mat(nullptr), m_Raduis(0,0f){
+SphereObj::SphereObj() : m_Mat(nullptr), m_Raduis(0.0f){
 	//m_Mat = new GL_Material();
 }
 SphereObj::SphereObj(float r, glm::vec3 &pos, GL_Material &mat){
@@ -253,7 +253,6 @@ bool SphereObj::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &
 		return false;
 	intersection.m_Dis = Dis;
 	intersection.m_IsHit = true;
-	dmin = Dis;
 	intersection.m_Material = m_Mat;
 	glm::vec3 tpos = Dis * ray.m_Dirction + ray.m_Origin;
 	glm::vec3 tnormal = tpos - getPos();

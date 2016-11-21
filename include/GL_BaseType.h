@@ -111,7 +111,8 @@ public:
 	glm::vec3 m_emission;
 
 	GL_Texture *m_PTexture;
-	GL_Material(RenderType RenderType = TEXTURE_TYPE, MaterialType MatType = DIFF);
+	GL_Material(MaterialType MatType = DIFF, RenderType renType = TEXTURE_TYPE);
+	GL_Material(glm::vec3 &emmision, glm::vec3 &color, MaterialType MatType = DIFF, RenderType renType = TEXTURE_TYPE);
 	GL_Material(GL_Material&);
 	GL_Material& operator= (GL_Material&);
 	bool LoadTexture(GLenum, std::string&);

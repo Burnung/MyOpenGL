@@ -38,7 +38,7 @@ bool GL_Scene::addSphereObj(glm::vec3 &center, float raduis,GL_Material &mat){
 		ERROROUT("error to creat sphere");
 		return false;
 	}
-	tmpSphere->Init(center, raduis, mat);
+	tmpSphere->Init(raduis,center,mat);
 	addObject(tmpSphere);
 		
 }
@@ -74,8 +74,8 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	glm::vec3 T_Col = tMat->m_colour;
 	float Col_Max = std::max(std::max(T_Col.r, T_Col.g), T_Col.b);
 	if (n_depth >= PHO_PahtTracer::Instance().GetMaxDepth()){
-		if (Col_Max < PHO_Random::Instance().GetDouble() > Col_Max)
-			return tMat->m_colour;
+		if (Col_Max < PHO_Random::Instance().GetDouble())
+			return glm::vec3(0, 0, 0);// tMat->m_colour;
 		T_Col *= (1.0f / Col_Max);
 	}
 	//光线可能是在模型内部传递
@@ -83,7 +83,8 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	glm::vec3 corNormal = glm::dot(orNormal, ray.m_Dirction) < 0 ? orNormal : -1.0f * orNormal;
 	//处理反射光线
 
-	if (tMat->m_MaterialType == MaterialType::DIFF){   //为漫反射表面 随机生成光线
+	if (tMat->m_MaterialType == MaterialType::DIFF){  //为漫反射表面 随机生成光线
+		return glm::vec3(1.0f, 0.0f, 0.0f);
 		float Theta = PHO_Random::Instance().GetDouble() * PI * 0.5;
 		float Tlen2 = PHO_Random::Instance().GetDouble();
 		float Tlen = sqrtf(Tlen2);
@@ -96,12 +97,14 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 		return tMat->m_emission + T_Col * GoTrace(newRay, n_depth + 1);
 	}  //如果是镜面反射
 	if (tMat->m_MaterialType == MaterialType::SPEC){
+		return glm::vec3(0.0f, 1.0f, 0.0f);
 		//计算反射光线
 		glm::vec3 TDir = glm::reflect(-ray.m_Dirction, corNormal);
 		GL_Ray new_Ray(myInter.m_Vertex.pos, TDir);
 		return tMat->m_emission + T_Col * GoTrace(new_Ray, n_depth + 1);
 	}
 	//那么就是折射 既有镜面反射又有透射
+	return glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 refdir = glm::reflect(-ray.m_Dirction, corNormal); //反射光线
 	GL_Ray refRay(myInter.m_Vertex.pos, refdir);
 	float Trefra = glm::dot(corNormal, orNormal) > 0 ? 1.0f / tMat->m_Refra : tMat->m_Refra;  //可能实在模型内部

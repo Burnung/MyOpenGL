@@ -1,4 +1,4 @@
-#ifndef GL_VIEWPOR_H
+#ifndef GL_VIEWPORT_H
 
 #define GL_VIEWPORT_H
 #include"gl_util.h"
