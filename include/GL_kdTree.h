@@ -27,9 +27,13 @@ public:
 	vector<Triangle*> m_Triangles;
 	AABB_Box m_AABB;     //该节点的包围盒 
 
+	GL_Material *m_Mat;
+
+	int getTriSize();
+
 	int getAxis(vector<Triangle*> tmpTri);
 	int getAxis(AABB_Box &tmpAABB,float &Midp);
-	bool InterSect(GL_Ray& ray, GL_ObjIntersection& infersection, float &tmin);
+	bool InterSect(GL_Ray& ray, GL_ObjIntersection& infersection, float tmin);
 };
 
 

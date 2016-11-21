@@ -71,7 +71,7 @@ template<typename T>
 void PHO_Clamp(T Tmin, T Tmax, T& var){
 	if (var < Tmin)
 		var = Tmin;
-	else if (var > Tmin)
+	else if (var > Tmax)
 		var = Tmax;
 }
 

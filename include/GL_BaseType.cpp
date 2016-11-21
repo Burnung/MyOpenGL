@@ -45,7 +45,7 @@ GL_Material::GL_Material(glm::vec3 &emmision, glm::vec3 &color, MaterialType Mat
 		m_Refra = 1.5f;     //空气射入介质
 }
 GL_Material::GL_Material(MaterialType MatType, RenderType RenType) : m_RenderType(RenType), m_MaterialType(MatType)
-, m_PTexture(nullptr), m_colour(0.5f, 0.5f, 0.5f), m_emission(0.2f, 0.2f, 0.2f){
+, m_PTexture(nullptr), m_colour(0.5f, 0.5f, 0.5f), m_emission(0.0f, 0.0f, 0.0f){
 
 }
 GL_Material::GL_Material(GL_Material& tmpM){
@@ -86,7 +86,7 @@ glm::vec3 Triangle::getMidPoint(){
 }
 
 bool Sphere_Box::Intersect(GL_Ray &ray, float &dis, float min){
-	glm::vec3 Orig2Center = m_Center - ray.m_Origin;
+	/*glm::vec3 Orig2Center = m_Center - ray.m_Origin;
 	float Distb = glm::dot(ray.m_Dirction, Orig2Center);
 	if (Distb < 0)   //球在反方向
 		return false;
@@ -102,6 +102,20 @@ bool Sphere_Box::Intersect(GL_Ray &ray, float &dis, float min){
 	dis = sqrt(Distb*Distb - DisCenter2Ray + m_Radius*m_Radius);
 	if (dis > GL_eps && dis < min)
 		return true;
+	return false;*/
+	bool hit = false;
+	float distance = 0;
+	glm::vec3 n(0,0,0);
+
+	glm::vec3 op = m_Center - ray.m_Origin;
+	double t, eps = 1e-4, b = glm::dot(op, ray.m_Dirction), det = b*b - glm::dot(op, op) + m_Radius*m_Radius;
+	if (det<0) return false;
+	else det = sqrt(det);
+	distance = (t = b - det)>eps ? t : ((t = b + det)>eps ? t : 0);
+	if (distance != 0 && distance <min){
+		dis = distance;
+		return true;
+	}
 	return false;
 		
 	
@@ -120,12 +134,7 @@ void AABB_Box::ExpandBox(AABB_Box &TBox){
 
 }
 bool AABB_Box::Intersect(GL_Ray &ray, float &Dis, float min){
-	glm::vec3 TCenter = (m_MaxPos + m_MinPos) * 0.5f;
-	glm::vec3 TDiff = m_MaxPos - m_MinPos;
-	float raduis = TDiff.x > std::max(TDiff.y, TDiff.z) ? TDiff.x : std::max(TDiff.y, TDiff.z);
-	Sphere_Box tmpSphereBox(TCenter, raduis*0.5f + 0.5f);  //球包围盒稍微大一点
-	if (!tmpSphereBox.Intersect(ray, Dis, min))
-		return false;
+
 	float tmax, tmin;
 	if (abs(ray.m_Dirction.x) < GL_eps){
 		tmax = INFINITY;
@@ -144,24 +153,37 @@ bool AABB_Box::Intersect(GL_Ray &ray, float &Dis, float min){
 		tmin = std::max(tmin, std::min(ty1, ty2));
 	}
 	if (abs(ray.m_Dirction.z) > GL_eps){
-		float tz1 = (m_MinPos.z - ray.m_Dirction.z) / ray.m_Dirction.z;
-		float tz2 = (m_MaxPos.z - ray.m_Dirction.z) / ray.m_Dirction.z;
+		float tz1 = (m_MinPos.z - ray.m_Origin.z) / ray.m_Dirction.z;
+		float tz2 = (m_MaxPos.z - ray.m_Origin.z) / ray.m_Dirction.z;
 		tmax = std::min(tmax, std::max(tz1, tz2));
 		tmin = std::max(tmin, std::min(tz1, tz2));
 	}
-	Dis = tmin;
+	//Dis = tmin;
 	return tmax >= tmin;
+
 }
 
 GL_ObjIntersection::GL_ObjIntersection() :m_IsHit(false), m_Material(nullptr){
-	m_Dis = INFINITY;
+	m_Dis =  INFINITY;
 	m_Vertex = Vertex();
 
 }
-bool Triangle::Intersect(GL_Ray &ray, float &Dis, float mindis,float u,float v){
-	glm::vec3 VecOA = m_p1.pos - ray.m_Origin;
-	Dis = glm::dot(VecOA, ray.m_Dirction);
-	if (Dis < 0 || Dis >mindis)
+
+void Triangle::ComputeNormal(){
+	glm::vec3 e1 = glm::normalize(m_p2.pos - m_p1.pos);
+	glm::vec3 e2 = glm::normalize(m_p3.pos - m_p1.pos);
+	glm::vec3 tNorm = glm::normalize(glm::cross(e1, e2));
+	m_Normal = glm::dot(tNorm, m_p1.normal) > 0 ? tNorm : tNorm *-1.0f;
+
+}
+bool Triangle::Intersect(GL_Ray &ray, float &Dis, float mindis,float &u,float &v){
+
+	/*glm::vec3 VecOA = m_p1.pos - ray.m_Origin;
+	if (glm::dot(VecOA, ray.m_Dirction) < 0)
+		return false;
+	float Dis1 = abs(glm::dot(VecOA, m_Normal));
+	Dis = abs(Dis1 / (glm::dot(ray.m_Dirction, m_Normal)));
+	if (Dis >mindis)
 		return false;
 	glm::vec3 intersection = ray.m_Origin + Dis * ray.m_Dirction;
 
@@ -176,11 +198,35 @@ bool Triangle::Intersect(GL_Ray &ray, float &Dis, float mindis,float u,float v){
 	t2 = glm::dot(v0, e2);
 	v = (t1 * c - t2 * a) / (c * c - a * b);
 	u = (t1 * b - t2 * c) / (a * b - c * c);
-	if (u > 0 && v > 0 && u + v < 1)
+	if (u >= 0 && v >= 0 && u + v <= 1)
 		return true;
-	return false;
+	return false;*/
 
+	u = 0;
+	v = 0;
+	double t_temp = 0;
+	glm::vec3 e1 = m_p2.pos - m_p1.pos;
+	glm::vec3 e2 = m_p3.pos - m_p1.pos;
+	glm::vec3 pvec = glm::cross( ray.m_Dirction,e2);
+	double det = glm::dot(pvec, e1);
+	if (det == 0) return false;
+	double invDet = 1. / det;
+	glm::vec3 tvec = ray.m_Origin - m_p1.pos;
+	u = glm::dot(tvec, pvec) * invDet;
+	if (u < 0 || u > 1) return false;
+	glm::vec3 qvec = glm::cross(tvec, e1);
+	v = glm::dot(ray.m_Dirction, qvec) * invDet;
+	if (v < 0 || u + v > 1) return false;
+	t_temp = glm::dot(e2, qvec) * invDet; // Set distance along ray to intersection
+	if (t_temp < mindis) {
+		if (t_temp > 1e-9){    // Fairly arbritarily small value, scared to change
+			Dis = t_temp;
+			return true;
+		}
+	}
+	return false;
 }
+
 
 void Triangle::ComVertex(float u, float v, Vertex &ret){
 	float w = 1.0f - u - v;

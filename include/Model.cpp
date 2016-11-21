@@ -55,6 +55,7 @@ bool Model::LoadFromFile(std::string &filename, bool kdTree){
 		ERROROUT("error to create kdTree");
 		return false;
 	}
+	int kdSize = m_kdTree->getTriSize();
 	return true;
 }
 
@@ -145,6 +146,7 @@ bool Model::InitEntity(int index, const aiMesh* m_mesh){
 			TmpTri->m_p2 = m_Vertex[Face.mIndices[1]];
 			TmpTri->m_p3 = m_Vertex[Face.mIndices[2]];
 			TmpTri->m_PMaterial = m_Materials[m_Entities[index].MaterialIndex];
+			TmpTri->ComputeNormal();
 			m_Triangles.push_back(TmpTri);
 		}
 
@@ -203,6 +205,23 @@ void Model::Render(){
 bool Model::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float &dmin){
 	if (!IskdTree)
 		return false;
+	float mTmin = dmin;
+	float Dis;
+	Triangle *ret = nullptr;
+	float u(0), v(0);
+	/*for (auto item : m_Triangles){
+
+		if (item->Intersect(ray, Dis, mTmin,u,v)){
+			mTmin = Dis;
+			ret = item;
+		}
+	}
+	if (!ret)
+		return false;
+	intersection.m_Dis = Dis;
+	intersection.m_IsHit = true;
+	intersection.m_Material = m_WholeMaterial;
+	return true;*/
 	return m_kdTree->InterSect(ray, intersection, dmin);
 }
 

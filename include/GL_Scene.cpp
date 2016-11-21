@@ -57,7 +57,7 @@ GL_ObjIntersection GL_Scene::Intersect(GL_Ray &ray){
 	for (auto item : m_Objects){
 		GL_ObjIntersection tmp;
 		item->InterSect(ray, tmp, ret_its.m_Dis);
-		if (tmp.m_IsHit && tmp.m_Dis < ret_its.m_Dis)
+		if (tmp.m_IsHit)// && tmp.m_Dis < ret_its.m_Dis)
 			ret_its = tmp;
 	}
 	return ret_its;
@@ -84,7 +84,7 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	//处理反射光线
 
 	if (tMat->m_MaterialType == MaterialType::DIFF){  //为漫反射表面 随机生成光线
-		return glm::vec3(1.0f, 0.0f, 0.0f);
+		return T_Col;
 		float Theta = PHO_Random::Instance().GetDouble() * PI * 0.5;
 		float Tlen2 = PHO_Random::Instance().GetDouble();
 		float Tlen = sqrtf(Tlen2);

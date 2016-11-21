@@ -2,7 +2,7 @@
 #include"Camera.h"
 #include<glm/gtc/matrix_transform.hpp>
 
-PHO_ViewPort::PHO_ViewPort() :m_Width(512), m_Height(512), m_Nearest(1.0f), m_Farthest(500.0f),m_Fovy(60.0f), m_Camera(nullptr), m_ViewPortChange(true){
+PHO_ViewPort::PHO_ViewPort() :m_Width(512), m_Height(512), m_Nearest(1.0f), m_Farthest(1500.0f),m_Fovy(60.0f), m_Camera(nullptr), m_ViewPortChange(true){
 	m_Camera = new Camera(glm::vec3(0, 50, -100), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0),m_Width,m_Height);
 }
 

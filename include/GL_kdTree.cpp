@@ -10,12 +10,19 @@ GL_kdTree::~GL_kdTree(){
 		SAFERELEASE(m_PRightChild);
 	m_Triangles.clear();
 }
+
+int GL_kdTree::getTriSize(){
+	if (!IsLeaf)
+		return m_PLeftChild->getTriSize() + m_PRightChild->getTriSize();
+	return m_Triangles.size();
+}
 GL_kdTree* GL_kdTree::Build(std::vector<Triangle*>&triangles, int depth){
 	GL_kdTree *nowkdNode = new GL_kdTree;
 	if ( triangles.size() == 0)
 		return nowkdNode;
 
 	nowkdNode->m_AABB = triangles[0]->getAABB();
+	nowkdNode->m_Mat = triangles[0]->m_PMaterial;
 	for (auto item : triangles) 
 		nowkdNode->m_AABB.ExpandBox(item->getAABB());
 	if (triangles.size() <= MIN_COUNT || depth >= MAX_DEPTH){
@@ -82,21 +89,23 @@ int GL_kdTree::getAxis(AABB_Box &tmpAABB,float &MidP){
 	}
 }
 
-bool GL_kdTree::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float &tmin){
-	float Dis;
-	if (!m_AABB.Intersect(ray, Dis,tmin))
-		return false;
-	if (Dis > tmin)
-		return false;
+bool GL_kdTree::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float tmin){
+	float Dis = intersection.m_Dis;
+	//if (!m_AABB.Intersect(ray, Dis,tmin))
+		//return false;
+	//if (Dis > tmin)
+		//return false;
+	//return true;*/
 	if (!IsLeaf)
 		return m_PLeftChild->InterSect(ray, intersection, tmin) || m_PRightChild->InterSect(ray, intersection, tmin);
 	//bool isInterTri(false);
+	float m_tmin = tmin;
 	Triangle *hitTri(nullptr);
 	float retU = 0, retV = 0;
 	float u = 0, v = 0;
 	for (auto item : m_Triangles){
-		if (item->Intersect(ray, Dis, tmin,u,v)){
-			tmin = Dis;
+		if (item->Intersect(ray, Dis, m_tmin, u, v)){
+			m_tmin = Dis;
 			hitTri = item;
 			retU = u;
 			retV = v;

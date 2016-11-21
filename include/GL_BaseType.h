@@ -9,7 +9,7 @@
 
 class GL_Material;
 
-const float GL_eps = 1e-4;
+const float GL_eps = 1e-10;
 
 struct Vertex{
 
@@ -74,7 +74,8 @@ struct Triangle{
 	GL_Material *m_PMaterial;    //材质指针
 	AABB_Box getAABB();
 	glm::vec3 getMidPoint();
-	bool Intersect(GL_Ray &ray, float &Dis,float mindis,float u,float v);
+	void ComputeNormal();
+	bool Intersect(GL_Ray &ray, float &Dis,float mindis,float &u,float &v);
 	void ComVertex(float u, float v, Vertex &ret);//根据位置计算三角形中点的法线 uv坐标等
 };
 
