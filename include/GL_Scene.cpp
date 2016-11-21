@@ -84,7 +84,7 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	//处理反射光线
 
 	if (tMat->m_MaterialType == MaterialType::DIFF){  //为漫反射表面 随机生成光线
-		return T_Col;
+		return tMat->m_colour;
 		float Theta = PHO_Random::Instance().GetDouble() * PI * 0.5;
 		float Tlen2 = PHO_Random::Instance().GetDouble();
 		float Tlen = sqrtf(Tlen2);
@@ -114,7 +114,7 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 		return tMat->m_emission + tMat->m_colour * GoTrace(refRay, n_depth + 1);
 	}
 	//计算折射光线
-	return glm::vec3(0, 0, 0);
+	//return glm::vec3(0, 0, 0);
 	glm::vec3 refradir = glm::normalize(glm::refract(ray.m_Dirction, corNormal, 1.0f / Trefra));
 
 	//使用菲涅耳公式计算 折射和反射的光线

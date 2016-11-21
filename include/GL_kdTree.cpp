@@ -91,8 +91,8 @@ int GL_kdTree::getAxis(AABB_Box &tmpAABB,float &MidP){
 
 bool GL_kdTree::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float tmin){
 	float Dis = intersection.m_Dis;
-	//if (!m_AABB.Intersect(ray, Dis,tmin))
-		//return false;
+	if (!m_AABB.Intersect(ray, Dis, tmin))
+		return false;
 	//if (Dis > tmin)
 		//return false;
 	//return true;*/

@@ -71,12 +71,12 @@ bool GL_Material::LoadTexture(GLenum TexType, std::string& filename){
 
 AABB_Box Triangle::getAABB(){
 	return AABB_Box(
-		glm::vec3(std::min(std::min(m_p1.pos.x, m_p2.pos.x), m_p2.pos.x),
-		std::min(std::min(m_p1.pos.y, m_p2.pos.y), m_p2.pos.y),
-		std::min(std::min(m_p1.pos.z, m_p2.pos.z), m_p2.pos.z)),
-		glm::vec3(std::max(std::max(m_p1.pos.x, m_p2.pos.x), m_p2.pos.x),
-		std::max(std::max(m_p1.pos.y, m_p2.pos.y), m_p2.pos.y),
-		std::max(std::max(m_p1.pos.z, m_p2.pos.z), m_p2.pos.z))
+		glm::vec3(std::min(std::min(m_p1.pos.x, m_p2.pos.x), m_p3.pos.x),
+		std::min(std::min(m_p1.pos.y, m_p2.pos.y), m_p3.pos.y),
+		std::min(std::min(m_p1.pos.z, m_p2.pos.z), m_p3.pos.z)),
+		glm::vec3(std::max(std::max(m_p1.pos.x, m_p2.pos.x), m_p3.pos.x),
+		std::max(std::max(m_p1.pos.y, m_p2.pos.y), m_p3.pos.y),
+		std::max(std::max(m_p1.pos.z, m_p2.pos.z), m_p3.pos.z))
 		);
 
 }
