@@ -64,6 +64,7 @@ enum MaterialType{
 	DIFF,
 	SPEC,
 	REFR,
+	EMMI,
 	NUM,
 };
 

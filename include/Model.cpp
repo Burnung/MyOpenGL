@@ -50,12 +50,14 @@ bool Model::LoadFromFile(std::string &filename, bool kdTree){
 
 	if (!kdTree || !ret)
 		return ret;
+
 	m_kdTree = GL_kdTree::Build(m_Triangles,0);
+	//m_kdTree->getTriSize();
 	if (!m_kdTree){
 		ERROROUT("error to create kdTree");
 		return false;
 	}
-	int kdSize = m_kdTree->getTriSize();
+	//int kdSize = m_kdTree->getTriSize();
 	return true;
 }
 
@@ -147,6 +149,7 @@ bool Model::InitEntity(int index, const aiMesh* m_mesh){
 			TmpTri->m_p3 = m_Vertex[Face.mIndices[2]];
 			TmpTri->m_PMaterial = m_Materials[m_Entities[index].MaterialIndex];
 			TmpTri->ComputeNormal();
+			TmpTri->m_id = m_Triangles.size();
 			m_Triangles.push_back(TmpTri);
 		}
 
@@ -205,24 +208,34 @@ void Model::Render(){
 bool Model::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float &dmin){
 	if (!IskdTree)
 		return false;
-	float mTmin = dmin;
+	/*float mTmin = dmin;
 	float Dis;
 	Triangle *ret = nullptr;
 	float u(0), v(0);
-	/*for (auto item : m_Triangles){
+	float retu, retv;
+	for (auto item : m_Triangles){
 
 		if (item->Intersect(ray, Dis, mTmin,u,v)){
 			mTmin = Dis;
-			ret = item;
+			ret = item;           
+			retu = u;
+			retv = v;
 		}
 	}
 	if (!ret)
 		return false;
 	intersection.m_Dis = Dis;
 	intersection.m_IsHit = true;
+	Vertex tmpVer;
+	ret->ComVertex(retu, retv, tmpVer);
 	intersection.m_Material = m_WholeMaterial;
+	intersection.m_Vertex = tmpVer;
 	return true;*/
+
+
 	return m_kdTree->InterSect(ray, intersection, dmin);
+
+
 }
 
 Model::ModelEntity::ModelEntity()
@@ -274,7 +287,7 @@ bool SphereObj::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &
 	intersection.m_IsHit = true;
 	intersection.m_Material = m_Mat;
 	glm::vec3 tpos = Dis * ray.m_Dirction + ray.m_Origin;
-	glm::vec3 tnormal = tpos - getPos();
+	glm::vec3 tnormal = (tpos - getPos());
 	Vertex tVer(tpos, tnormal,glm::vec2(0,0));
 	intersection.m_Vertex = tVer;
 

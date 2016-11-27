@@ -12,11 +12,21 @@ GL_kdTree::~GL_kdTree(){
 }
 
 int GL_kdTree::getTriSize(){
+	float dis;
+//	if (!this->m_AABB.Intersect(GL_Ray(glm::vec3(0, -5.0f, 2.5f), glm::vec3(-0.223117277, 0.947524309, -0.228945851)), dis, 1000))
+	//	return 0;
 	if (!IsLeaf)
 		return m_PLeftChild->getTriSize() + m_PRightChild->getTriSize();
+	for (auto item : m_Triangles){
+		if (item->m_id == 29772){
+			bool tmp = this->m_AABB.Intersect(GL_Ray(glm::vec3(0, -5.0f, 2.5f), glm::vec3(-0.223117277, 0.947524309, -0.228945851)), dis,1000);
+			int a = 1;
+		}
+	}
 	return m_Triangles.size();
 }
 GL_kdTree* GL_kdTree::Build(std::vector<Triangle*>&triangles, int depth){
+
 	GL_kdTree *nowkdNode = new GL_kdTree;
 	if ( triangles.size() == 0)
 		return nowkdNode;
@@ -87,32 +97,38 @@ int GL_kdTree::getAxis(AABB_Box &tmpAABB,float &MidP){
 		MidP = (m_AABB.m_MaxPos.z + m_AABB.m_MinPos.z) * 0.5f;
 		return Z_AXIS;
 	}
+	return X_AXIS;
 }
 
-bool GL_kdTree::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float tmin){
+bool GL_kdTree::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float &tmin){
+
 	float Dis = intersection.m_Dis;
 	if (!m_AABB.Intersect(ray, Dis, tmin))
-		return false;
-	//if (Dis > tmin)
-		//return false;
-	//return true;*/
-	if (!IsLeaf)
-		return m_PLeftChild->InterSect(ray, intersection, tmin) || m_PRightChild->InterSect(ray, intersection, tmin);
+		 return false;
+
+	if (!IsLeaf){
+		bool retL, retR;
+		retL = m_PLeftChild->InterSect(ray, intersection, tmin);
+		retR = m_PRightChild->InterSect(ray, intersection, tmin);
+		return retL || retR;
+	}
 	//bool isInterTri(false);
+	//getTriSize();
 	float m_tmin = tmin;
 	Triangle *hitTri(nullptr);
 	float retU = 0, retV = 0;
 	float u = 0, v = 0;
 	for (auto item : m_Triangles){
-		if (item->Intersect(ray, Dis, m_tmin, u, v)){
-			m_tmin = Dis;
+		if (item->Intersect(ray, Dis, tmin, u, v)){
+			tmin = Dis;
 			hitTri = item;
 			retU = u;
 			retV = v;
 		}
 	}
 	if (hitTri == nullptr)
-		return false;
+		return false; 
+	//tmin = m_tmin;
 	//¼ÆËã×²»÷µã
 	Vertex HitVert;
 	hitTri->ComVertex(retU, retV, HitVert);
@@ -120,6 +136,7 @@ bool GL_kdTree::InterSect(GL_Ray &ray, GL_ObjIntersection &intersection,float tm
 	intersection.m_Dis = Dis;
 	intersection.m_Vertex = HitVert;
 	intersection.m_IsHit = true;
+
 	return true;
 
 }

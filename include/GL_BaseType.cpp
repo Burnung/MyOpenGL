@@ -72,11 +72,11 @@ bool GL_Material::LoadTexture(GLenum TexType, std::string& filename){
 AABB_Box Triangle::getAABB(){
 	return AABB_Box(
 		glm::vec3(std::min(std::min(m_p1.pos.x, m_p2.pos.x), m_p3.pos.x),
-		std::min(std::min(m_p1.pos.y, m_p2.pos.y), m_p3.pos.y),
-		std::min(std::min(m_p1.pos.z, m_p2.pos.z), m_p3.pos.z)),
+				  std::min(std::min(m_p1.pos.y, m_p2.pos.y), m_p3.pos.y),
+				  std::min(std::min(m_p1.pos.z, m_p2.pos.z), m_p3.pos.z)),
 		glm::vec3(std::max(std::max(m_p1.pos.x, m_p2.pos.x), m_p3.pos.x),
-		std::max(std::max(m_p1.pos.y, m_p2.pos.y), m_p3.pos.y),
-		std::max(std::max(m_p1.pos.z, m_p2.pos.z), m_p3.pos.z))
+				  std::max(std::max(m_p1.pos.y, m_p2.pos.y), m_p3.pos.y),
+				  std::max(std::max(m_p1.pos.z, m_p2.pos.z), m_p3.pos.z))
 		);
 
 }
@@ -124,18 +124,19 @@ bool Sphere_Box::Intersect(GL_Ray &ray, float &dis, float min){
 void AABB_Box::ExpandBox(AABB_Box &TBox){
 	this->m_MinPos =
 		glm::vec3(std::min(TBox.m_MinPos.x, m_MinPos.x),
-		std::min(TBox.m_MinPos.y, m_MinPos.y),
-		std::min(TBox.m_MinPos.z, m_MinPos.z));
+				  std::min(TBox.m_MinPos.y, m_MinPos.y),
+				  std::min(TBox.m_MinPos.z, m_MinPos.z));
 
 	this->m_MaxPos =
 		glm::vec3(std::max(TBox.m_MaxPos.x, m_MaxPos.x),
-		std::max(TBox.m_MaxPos.y, m_MaxPos.y),
-		std::max(TBox.m_MaxPos.z, m_MaxPos.z));
+				  std::max(TBox.m_MaxPos.y, m_MaxPos.y),
+				  std::max(TBox.m_MaxPos.z, m_MaxPos.z));
 
 }
 bool AABB_Box::Intersect(GL_Ray &ray, float &Dis, float min){
 
 	float tmax, tmin;
+	ray.m_Dirction = glm::normalize(ray.m_Dirction);
 	if (abs(ray.m_Dirction.x) < GL_eps){
 		tmax = INFINITY;
 		tmin = -1.f * INFINITY;
@@ -143,23 +144,25 @@ bool AABB_Box::Intersect(GL_Ray &ray, float &Dis, float min){
 	else{
 		float tx1 = (m_MinPos.x - ray.m_Origin.x) / ray.m_Dirction.x;
 		float tx2 = (m_MaxPos.x - ray.m_Origin.x) / ray.m_Dirction.x;
-		tmax = tx1 >tx2 ? tx1 : tx2;
-		tmin = tx1 < tx2 ? tx1 : tx2;
+		tmax = std::max(tx1, tx2);
+		tmin = std::min(tx1,tx2);
 	}
-	if (abs(ray.m_Dirction.y) > GL_eps){
+	//if (abs(ray.m_Dirction.y) > GL_eps){
 		float ty1 = (m_MinPos.y - ray.m_Origin.y) / ray.m_Dirction.y;
 		float ty2 = (m_MaxPos.y - ray.m_Origin.y) / ray.m_Dirction.y;
-		tmax = std::min(tmax, std::max(ty1, ty2));
+		
 		tmin = std::max(tmin, std::min(ty1, ty2));
-	}
-	if (abs(ray.m_Dirction.z) > GL_eps){
+		tmax = std::min(tmax, std::max(ty1, ty2));
+	//}
+	//if (abs(ray.m_Dirction.z) > GL_eps){
 		float tz1 = (m_MinPos.z - ray.m_Origin.z) / ray.m_Dirction.z;
 		float tz2 = (m_MaxPos.z - ray.m_Origin.z) / ray.m_Dirction.z;
-		tmax = std::min(tmax, std::max(tz1, tz2));
+		
 		tmin = std::max(tmin, std::min(tz1, tz2));
-	}
+		tmax = std::min(tmax, std::max(tz1, tz2));
+	//}
 	//Dis = tmin;
-	return tmax >= tmin;
+		return tmin <= min && tmax >= tmin;
 
 }
 

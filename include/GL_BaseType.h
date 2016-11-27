@@ -5,6 +5,7 @@
 #include<Magick++.h>
 #include<glm\vec3.hpp>
 #include<glm\vec2.hpp>
+#include<glm\geometric.hpp>
 #include"gl_util.h"
 
 class GL_Material;
@@ -19,7 +20,7 @@ struct Vertex{
 
 
 	Vertex() :pos(glm::vec3(0, 0, 0)), normal(glm::vec3(0,0,-1)),uv(glm::vec2(0,0)){};
-	Vertex(glm::vec3 pos_, glm::vec3 normal_, glm::vec2 uv_) :pos(pos_), normal(normal_), uv(uv_)
+	Vertex(glm::vec3 pos_, glm::vec3 normal_, glm::vec2 uv_) :pos(pos_), normal(glm::normalize(normal_)), uv(uv_)
 	{
 	}
 
@@ -72,6 +73,7 @@ struct Triangle{
 	Vertex m_p1, m_p2, m_p3;   //按顺序的三角形
 	glm::vec3 m_Normal;        //三角形的法线
 	GL_Material *m_PMaterial;    //材质指针
+	int m_id;
 	AABB_Box getAABB();
 	glm::vec3 getMidPoint();
 	void ComputeNormal();

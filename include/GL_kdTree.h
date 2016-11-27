@@ -7,7 +7,7 @@
 using namespace std;
 
 const int MAX_DEPTH = 25;    //kdTree的最大层数
-const int MIN_COUNT = 7;    //叶子节点三角形的最小数量
+const int MIN_COUNT = 10;    //叶子节点三角形的最小数量
 
 class GL_kdTree{
 	enum AXIS{
@@ -33,7 +33,7 @@ public:
 
 	int getAxis(vector<Triangle*> tmpTri);
 	int getAxis(AABB_Box &tmpAABB,float &Midp);
-	bool InterSect(GL_Ray& ray, GL_ObjIntersection& infersection, float tmin);
+	bool InterSect(GL_Ray& ray,GL_ObjIntersection &infersections, float &tmin);
 };
 
 

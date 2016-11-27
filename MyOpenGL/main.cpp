@@ -14,6 +14,7 @@
 #include<PHO_Random.h>
 #include<PHO_ViewPort.h>
 #include<PHO_PathTracer.h>
+#include<time.h>
 
 const int WINDOWWIDTH = 512;
 const int WINDOWHEIGHT = 512;
@@ -53,13 +54,13 @@ public:
 	}
 
 	void Init(){
-
+		time_t m_start, m_end;
 		//SAFERELEASE(m_ViewPort);
 		m_ViewPort = new PHO_ViewPort();
-		//m_ViewPort->SetCameraPos(glm::vec3(0, -5, 2.5));
-		m_ViewPort->SetCameraPos(glm::vec3(350, 52, 295.6));
-		//m_ViewPort->SetCameraLookvec(glm::vec3(0, 0, 1.0f) - glm::vec3(0, -5, 2.5));
-		m_ViewPort->SetCameraLookvec(glm::vec3(0, -0.042612, -1));
+		m_ViewPort->SetCameraPos(glm::vec3(0, -5, 2.5));
+		//m_ViewPort->SetCameraPos(glm::vec3(350, 52, 295.6));
+		m_ViewPort->SetCameraLookvec(glm::vec3(0, 0, 1.0f) - glm::vec3(0, -5, 2.5));
+		//m_ViewPort->SetCameraLookvec(glm::vec3(0, -0.042612, -1));
 		m_ViewPort->SetCameraUpVec(glm::vec3(0, 1.0f, 0));
 		m_ViewPort->SetHeight(768);
 		m_ViewPort->SetWidth(1024);
@@ -69,14 +70,14 @@ public:
 		PHO_PahtTracer::Instance().Init(m_ViewPort);
 		SphereObj *spheres[] = {//Scene: radius, position, emission, color, material
 			//Master
-			/*new SphereObj(1000, glm::vec3(0, 0, -1000), GL_Material(glm::vec3(0, 0, 0), glm::vec3(0.4, 0.4, 0.85), DIFF)),//Left
+			new SphereObj(1000, glm::vec3(0, 0, -1000), GL_Material(glm::vec3(0, 0, 0), glm::vec3(1.0f,1.0f,1.0f), DIFF)),//Left
 			new SphereObj(1000, glm::vec3(-1004.f,0,0), GL_Material(glm::vec3(0, 0, 0), glm::vec3(0.85,0.4,0.4), DIFF)),//Rght
 			new SphereObj(1000, glm::vec3(1004, 0, 0), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.4, 0.4, 0.85), DIFF)),//Back
-			new SphereObj(1000, glm::vec3(0, 1006, 0), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.85, 0.4, 0.4), DIFF)),//Frnt
-			new SphereObj(100, glm::vec3(0, 0, 110), GL_Material(glm::vec3(2.2f, 2.2f, 2.2f), glm::vec3(0.0f, 0.0f, 0.0f), DIFF)),*/
-			new SphereObj(1e5, glm::vec3(1e5 + 1, 40.8, 81.6), GL_Material(glm::vec3(0, 0, 0), glm::vec3(.75, .25, .25), DIFF)),//Left
-			new SphereObj(1e5, glm::vec3(-1e5 + 99, 40.8, 81.6), GL_Material(glm::vec3(0, 0, 0), glm::vec3(.25, .25, .75), DIFF)),//Rght
-			new SphereObj(1e5, glm::vec3(50, 40.8, 1e5), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Back
+			new SphereObj(1000, glm::vec3(0, 1006, 0), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,1.0f,1.0f), DIFF)),//Frnt
+			new SphereObj(100, glm::vec3(0, 0, 110), GL_Material(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), EMMI)),
+			//new SphereObj(1e5, glm::vec3(1e5 + 1, 40.8, 81.6), GL_Material(glm::vec3(0, 0, 0), glm::vec3(.75, .25, .25), DIFF)),//Left
+			//new SphereObj(1e5, glm::vec3(-1e5 + 99, 40.8, 81.6), GL_Material(glm::vec3(0, 0, 0), glm::vec3(.25, .25, .75), DIFF)),//Rght
+			//new SphereObj(1e5, glm::vec3(50, 40.8, 1e5), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Back
 			//new SphereObj(1e5, glm::vec3(50, 40.8, -1e5 + 170), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Frnt
 			//new SphereObj(1e5, glm::vec3(50, 1e5, 81.6), GL_Material(glm::vec3(0.0, 0.0, 0.0), glm::vec3(.75, .75, .75), DIFF)),
 			//new SphereObj(1e5, glm::vec3(50, -1e5 + 81.6, 81.6), GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(.75, .75, .75), DIFF)),//Botm
@@ -93,10 +94,16 @@ public:
 		tmpModel->SetMaterial(GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.9f), DIFF));
 		GL_Scene::Instance().addObject(tmpModel);
 		for (auto item : spheres)
-			GL_Scene::Instance().addObject(item);
-
+			 GL_Scene::Instance().addObject(item);
+		time(&m_start);
 		PHO_PahtTracer::Instance().GoTrace(4);
 		PHO_PahtTracer::Instance().Save2BMP("pathTracing.bmp");
+		time(&m_end);
+		double diff = difftime(m_end, m_start);
+		int hrs = (int)diff / 3600;
+		int mins = ((int)diff / 60) - (hrs * 60);
+		int secs = (int)diff - (hrs * 3600) - (mins * 60);
+		std::cout << std::endl << "cost time :" << hrs << "h" << mins << "m" << secs << "s" << std::endl;
 		/*m_Shader.loadShader("shader/Model.vert", nullptr, "shader/Model.frag");
 		//m_Camera = Camera()
 		ERROROUT("main.cpp is ok");

@@ -68,9 +68,11 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	GL_ObjIntersection myInter =  Intersect(ray);
 	if (!myInter.m_IsHit)
 		return glm::vec3(0, 0, 0);
-
-	//俄罗斯转盘 处理最大次数问题
 	GL_Material *tMat = myInter.m_Material;
+	if (tMat->m_MaterialType == EMMI)
+		return tMat->m_emission;
+	//俄罗斯转盘 处理最大次数问题
+
 	glm::vec3 T_Col = tMat->m_colour;
 	float Col_Max = std::max(std::max(T_Col.r, T_Col.g), T_Col.b);
 	if (n_depth >= PHO_PahtTracer::Instance().GetMaxDepth()){
@@ -84,8 +86,8 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	//处理反射光线
 
 	if (tMat->m_MaterialType == MaterialType::DIFF){  //为漫反射表面 随机生成光线
-		return tMat->m_colour;
-		float Theta = PHO_Random::Instance().GetDouble() * PI * 0.5;
+
+		float Theta = PHO_Random::Instance().GetDouble() * PI *2;
 		float Tlen2 = PHO_Random::Instance().GetDouble();
 		float Tlen = sqrtf(Tlen2);
 
@@ -94,24 +96,23 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 		glm::vec3 t_dir = x_axi * cos(Theta) * Tlen + y_axi * sin(Theta) * Tlen + corNormal * sqrtf(1 - Tlen2);
 		t_dir = glm::normalize(t_dir);
 		GL_Ray newRay(myInter.m_Vertex.pos, t_dir);
-		return tMat->m_emission + T_Col * GoTrace(newRay, n_depth + 1);
+		return  T_Col * GoTrace(newRay, n_depth + 1);
 	}  //如果是镜面反射
 	if (tMat->m_MaterialType == MaterialType::SPEC){
-		return glm::vec3(0.0f, 1.0f, 0.0f);
 		//计算反射光线
 		glm::vec3 TDir = glm::reflect(-ray.m_Dirction, corNormal);
 		GL_Ray new_Ray(myInter.m_Vertex.pos, TDir);
-		return tMat->m_emission + T_Col * GoTrace(new_Ray, n_depth + 1);
+		return  T_Col * GoTrace(new_Ray, n_depth + 1);
 	}
 	//那么就是折射 既有镜面反射又有透射
-	return glm::vec3(0.0f, 0.0f, 1.0f);
+
 	glm::vec3 refdir = glm::reflect(-ray.m_Dirction, corNormal); //反射光线
 	GL_Ray refRay(myInter.m_Vertex.pos, refdir);
 	float Trefra = glm::dot(corNormal, orNormal) > 0 ? 1.0f / tMat->m_Refra : tMat->m_Refra;  //可能实在模型内部
 	float cosTheta = glm::dot(ray.m_Dirction, corNormal);  //其实是-cos
 	if (1 - cosTheta * cosTheta > 1.0f/(Trefra * Trefra)){  //发生全反射
 
-		return tMat->m_emission + tMat->m_colour * GoTrace(refRay, n_depth + 1);
+		return tMat->m_colour * GoTrace(refRay, n_depth + 1);
 	}
 	//计算折射光线
 	//return glm::vec3(0, 0, 0);
@@ -128,11 +129,11 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	if (n_depth <= 1){
 		glm::vec3 col_re = (float)Pfre * GoTrace(refRay, n_depth + 1);
 		glm::vec3 col_fra = (float)pfra * GoTrace(FraRay, n_depth + 1);
-		return tMat->m_emission + tMat->m_colour *(col_re + col_fra);
+		return  tMat->m_colour *(col_re + col_fra);
 	}
 	if (PHO_Random::Instance().GetDouble() < Tf)
-		return tMat->m_emission + AllRe * tMat->m_colour * GoTrace(refRay, n_depth + 1);
-	return tMat->m_emission + AllRe * tMat->m_colour * GoTrace(FraRay, n_depth + 1);
+		return AllRe * tMat->m_colour * GoTrace(refRay, n_depth + 1);
+	return AllFra * tMat->m_colour * GoTrace(FraRay, n_depth + 1);
 
 
 }
