@@ -91,12 +91,12 @@ public:
 			std::cout << "cant load model" << std::endl;
 			return;
 		}
-		tmpModel->SetMaterial(GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.9f), DIFF));
+		tmpModel->SetMaterial(GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.9f), SPEC));
 		GL_Scene::Instance().addObject(tmpModel);
 		for (auto item : spheres)
 			 GL_Scene::Instance().addObject(item);
 		time(&m_start);
-		PHO_PahtTracer::Instance().GoTrace(4);
+		PHO_PahtTracer::Instance().GoTrace(100);
 		PHO_PahtTracer::Instance().Save2BMP("pathTracing.bmp");
 		time(&m_end);
 		double diff = difftime(m_end, m_start);
