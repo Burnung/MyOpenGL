@@ -1,4 +1,4 @@
 # MyOpenGL
 Just some code for CG.
 
-change 1.
+change 2.
