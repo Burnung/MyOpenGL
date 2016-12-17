@@ -1,5 +1,5 @@
 #include"GL_kdTree.h"
-
+#include <algorithm> 
 GL_kdTree::GL_kdTree():IsLeaf(false),m_PLeftChild(nullptr),m_PRightChild(nullptr){
 	m_Triangles = std::vector<Triangle*>();
 }

@@ -134,7 +134,7 @@ bool Model::InitEntity(int index, const aiMesh* m_mesh){
 		 }
 		 else
 			 tmpUv = glm::vec2(0, 0);
-		 m_Vertex[i] = Vertex(tmpPos, tmpNormal, tmpUv);
+		 m_Vertex[i] = Vertex(tmpPos+getPos(), tmpNormal, tmpUv);
 	}
 	for (int i = 0; i < m_mesh->mNumFaces; i++) {
 		const aiFace& Face = m_mesh->mFaces[i];

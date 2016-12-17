@@ -2,7 +2,6 @@
 #define GL_TEXTURE_H
 #include<string>
 #include<gl\glew.h>
-#include<Magick++.h>
 #include<glm\vec3.hpp>
 #include<glm\vec2.hpp>
 #include<glm\geometric.hpp>
@@ -100,8 +99,7 @@ private :
 	int m_Height;
 	GLuint m_TexId;
 	GLenum m_TexType;
-	Magick::Image m_Image;
-	Magick::Blob m_Blob;
+
 
 };
 

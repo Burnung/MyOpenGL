@@ -3,7 +3,7 @@
 #include"GL_Scene.h"
 #include"GL_Scene.h"
 
-const int PATHTRACER_MAX_DEPTH = 5;
+const int PATHTRACER_MAX_DEPTH = 9;
 GL_DEFINE_SINGLETON(PHO_PahtTracer);
 
 PHO_PahtTracer::~PHO_PahtTracer(){
@@ -96,14 +96,14 @@ void PHO_PahtTracer::GoTrace(int samples){
 
 #ifndef PATHTRACER_USE_GPU                                   //使用CPU 
 #pragma omp parallel for schedule(dynamic, 1)                 //openPM
-	for (int y = 0; y < m_WindowHeight; y++){
+	for (int y = 0; y </*420*/ m_WindowHeight; y++){
 		
 		std::cout << "\r now is " << y / (1.0f * m_WindowHeight) * 100 << "%";
 		//构造随机器种子
 		unsigned short TSeed[3] = { 0, 0, y*y*y };
 		//用之前一定要Init
 		PHO_Random::Instance().SetSeed(TSeed);
-		for (int x = 0; x < m_WindowWidth ; x++){
+		for (int x = 0; x < /*508*/ m_WindowWidth ; x++){
 			if (x == 0 && y == m_WindowHeight -1)
 				int tmpaaa = 1;
 			glm::vec3 TCol(0.0f, 0.0f, 0.0f);

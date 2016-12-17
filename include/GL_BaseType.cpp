@@ -1,6 +1,8 @@
 #include"GL_BaseType.h"
 #include"gl_util.h"
 #include<glm\glm.hpp>
+#include<FreeImage.h>
+#include <algorithm> 
 GL_Texture::GL_Texture(GLenum TexType_, std::string&filename):m_TexType(TexType_),m_Filename(filename)
 {
 }
@@ -12,25 +14,37 @@ bool GL_Texture::Load(GLenum TexType_, std::string&filename){
 }
 
 bool GL_Texture::Load(){
-	try{
-		m_Image.read(m_Filename);
-		m_Image.write(&m_Blob, "RGBA");
-	}
-	catch (Magick::Error &Error){
-		char error[1024];
-		ZERO_MEM(error);
-		sprintf_s(error, sizeof(error), "Error Loading Texture %s :%s", m_Filename.c_str(), Error.what());
-		ERROROUT(error);
+
+	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+	FIBITMAP *dib(NULL);
+	BYTE *bits(NULL);
+	m_Width = 0;
+	m_Height = 0;
+
+	fif = FreeImage_GetFileType(m_Filename.c_str());
+	if (fif == FIF_UNKNOWN)
 		return false;
-	}
-	m_Height = m_Image.rows();
-	m_Width = m_Image.columns();
+	if (FreeImage_FIFSupportsReading(fif))
+		dib = FreeImage_Load(fif,m_Filename.c_str());
+	if (!dib)
+		return false;
+
+	bits = FreeImage_GetBits(dib);
+	m_Width = FreeImage_GetWidth(dib);
+	m_Height = FreeImage_GetHeight(dib);
+
+	if (!bits || m_Width == 0 || m_Height == 0)
+		return false;
+
 	glGenTextures(1, &m_TexId);
 	glBindTexture(m_TexType, m_TexId);
-	glTexImage2D(m_TexType, 0, GL_RGBA, m_Width, m_Height,0, GL_RGBA, GL_UNSIGNED_BYTE, m_Blob.data());
+	glTexImage2D(m_TexType, 0, GL_RGBA, m_Width, m_Height,0, GL_RGB, GL_UNSIGNED_BYTE, bits);
 	glTexParameterf(m_TexType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(m_TexType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(m_TexType, 0);
+
+	FreeImage_Unload(dib);
+
 	return true;
 }
 
@@ -41,11 +55,12 @@ void GL_Texture::Bind(GLenum TextureUnit){
 
 GL_Material::GL_Material(glm::vec3 &emmision, glm::vec3 &color, MaterialType MatType, RenderType RenType) :m_RenderType(RenType), m_MaterialType(MatType)
 , m_PTexture(nullptr), m_colour(color), m_emission(emmision){
-	if (m_MaterialType == MaterialType::REFR)
+	//if (m_MaterialType == MaterialType::REFR)
 		m_Refra = 1.5f;     //¿ÕÆøÉäÈë½éÖÊ
 }
 GL_Material::GL_Material(MaterialType MatType, RenderType RenType) : m_RenderType(RenType), m_MaterialType(MatType)
 , m_PTexture(nullptr), m_colour(0.5f, 0.5f, 0.5f), m_emission(0.0f, 0.0f, 0.0f){
+	m_Refra = 1.5f;
 
 }
 GL_Material::GL_Material(GL_Material& tmpM){
@@ -54,6 +69,7 @@ GL_Material::GL_Material(GL_Material& tmpM){
 	this->m_PTexture = tmpM.m_PTexture;
 	this->m_colour = tmpM.m_colour;
 	this->m_emission = tmpM.m_emission;
+	this->m_Refra = tmpM.m_Refra;
 }
 GL_Material& GL_Material::operator = (GL_Material& tmpM){
 	this->m_RenderType = tmpM.m_RenderType;
@@ -61,6 +77,7 @@ GL_Material& GL_Material::operator = (GL_Material& tmpM){
 	this->m_PTexture = tmpM.m_PTexture;
 	this->m_colour = tmpM.m_colour;
 	this->m_emission = tmpM.m_emission;
+	this->m_Refra = tmpM.m_Refra;
 	return *this;
 }
 bool GL_Material::LoadTexture(GLenum TexType, std::string& filename){

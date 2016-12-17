@@ -76,7 +76,7 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	glm::vec3 T_Col = tMat->m_colour;
 	float Col_Max = std::max(std::max(T_Col.r, T_Col.g), T_Col.b);
 	if (n_depth >= PHO_PahtTracer::Instance().GetMaxDepth()){
-		if (Col_Max < PHO_Random::Instance().GetDouble())
+		if (Col_Max * 0.9 < PHO_Random::Instance().GetDouble())
 			return glm::vec3(0, 0, 0);// tMat->m_colour;
 		T_Col *= (1.0f / Col_Max);
 	}
@@ -84,9 +84,8 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	glm::vec3 orNormal = myInter.m_Vertex.normal;
 	glm::vec3 corNormal = glm::dot(orNormal, ray.m_Dirction) < 0 ? orNormal : -1.0f * orNormal;
 	//处理反射光线
-
+	//return corNormal;
 	if (tMat->m_MaterialType == MaterialType::DIFF){  //为漫反射表面 随机生成光线
-
 		float Theta = PHO_Random::Instance().GetDouble() * PI *2;
 		float Tlen2 = PHO_Random::Instance().GetDouble();
 		float Tlen = sqrtf(Tlen2);
@@ -105,22 +104,31 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 		return  T_Col * GoTrace(new_Ray, n_depth + 1);
 	}
 	//那么就是折射 既有镜面反射又有透射
-
 	glm::vec3 refdir = glm::reflect(-ray.m_Dirction, corNormal); //反射光线
 	GL_Ray refRay(myInter.m_Vertex.pos, refdir);
 	float Trefra = glm::dot(corNormal, orNormal) > 0 ? 1.0f / tMat->m_Refra : tMat->m_Refra;  //可能实在模型内部
 	float cosTheta = glm::dot(ray.m_Dirction, corNormal);  //其实是-cos
+
+	
+	/*float sintheta1 = sqrt(1 - glm::dot(corNormal, ray.m_Dirction)*glm::dot(corNormal, ray.m_Dirction));
+	float sintheta2 = sqrt(1 - glm::dot(refradir, corNormal) * glm::dot(refradir, corNormal));
+	float tmptre = sintheta1 / sintheta2;*/
+
 	if (1 - cosTheta * cosTheta > 1.0f/(Trefra * Trefra)){  //发生全反射
 
 		return tMat->m_colour * GoTrace(refRay, n_depth + 1);
 	}
+	glm::vec3 refradir = glm::normalize(glm::refract(glm::normalize(ray.m_Dirction), glm::normalize(corNormal), Trefra));
+	
 	//计算折射光线
 	//return glm::vec3(0, 0, 0);
-	glm::vec3 refradir = glm::normalize(glm::refract(ray.m_Dirction, corNormal, 1.0f / Trefra));
+
 
 	//使用菲涅耳公式计算 折射和反射的光线
+	double costhe = glm::dot(corNormal, orNormal) > 0 ? cosTheta : glm::dot(refradir, corNormal);
+
 	double f0 = (Trefra - 1)*(Trefra - 1) / ((Trefra + 1) * (Trefra + 1));
-	double Pfre = f0 + (1 - f0) * pow(1 + cosTheta, 5);  //反射强度
+	double Pfre = f0 + (1 - f0) * pow(1 - abs(costhe), 5);  //反射强度
 	double pfra = 1.0 - Pfre;                            //折射强度
 	float Tf = 0.25 + Pfre * 0.5f;     //俄罗斯转盘
 	float AllRe = Pfre / Tf;

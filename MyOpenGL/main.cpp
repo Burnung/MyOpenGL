@@ -56,14 +56,15 @@ public:
 	void Init(){
 		time_t m_start, m_end;
 		//SAFERELEASE(m_ViewPort);
+
 		m_ViewPort = new PHO_ViewPort();
-		m_ViewPort->SetCameraPos(glm::vec3(0, -5, 2.5));
+		m_ViewPort->SetCameraPos(glm::vec3(0, -3.5, 2.0));
 		//m_ViewPort->SetCameraPos(glm::vec3(350, 52, 295.6));
-		m_ViewPort->SetCameraLookvec(glm::vec3(0, 0, 1.0f) - glm::vec3(0, -5, 2.5));
+		m_ViewPort->SetCameraLookvec(glm::vec3(0, 0, 1.0f) - glm::vec3(0, -3.5, 2.0));
 		//m_ViewPort->SetCameraLookvec(glm::vec3(0, -0.042612, -1));
 		m_ViewPort->SetCameraUpVec(glm::vec3(0, 1.0f, 0));
-		m_ViewPort->SetHeight(768);
-		m_ViewPort->SetWidth(1024);
+		m_ViewPort->SetHeight(760);
+		m_ViewPort->SetWidth(760);
 		m_ViewPort->InitCamera();
 		m_ViewPort->SetFovy(90);
 		PHO_Random::Instance().Init();
@@ -87,17 +88,19 @@ public:
 			
 		};
 		Model *tmpModel = new Model();
+		tmpModel->setPos(glm::vec3(0.0f, 0.0f, 0.5f));
 		if (!tmpModel->LoadFromFile(std::string("../Models/dragon2.obj"), true)){
 			std::cout << "cant load model" << std::endl;
 			return;
 		}
-		tmpModel->SetMaterial(GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.9f), SPEC));
+		tmpModel->SetMaterial(GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.9999f, 0.9999f, 0.9999f), REFR));
 		GL_Scene::Instance().addObject(tmpModel);
 		for (auto item : spheres)
-			 GL_Scene::Instance().addObject(item);
+			;// GL_Scene::Instance().addObject(item);
 		time(&m_start);
-		PHO_PahtTracer::Instance().GoTrace(100);
-		PHO_PahtTracer::Instance().Save2BMP("pathTracing.bmp");
+		std::cout << "now is tracing" << std::endl;
+	//	PHO_PahtTracer::Instance().GoTrace(600);
+		//PHO_PahtTracer::Instance().Save2BMP("cor_dir_1000.bmp");
 		time(&m_end);
 		double diff = difftime(m_end, m_start);
 		int hrs = (int)diff / 3600;
@@ -175,13 +178,13 @@ private:
 
 int main(){
 
-	//INITEERROROUT("log.txt");
+	INITEERROROUT("log.txt");
 	InitGLContex(WINDOWWIDTH, WINDOWHEIGHT, true, false, "test");
 	myApp *App = new myApp;
 	App->Init();
 	//App->Run();
 
-	//ENDERROROUT();
+	ENDERROROUT();
 	//while (1);
 
 
