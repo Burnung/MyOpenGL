@@ -17,9 +17,16 @@ const float PI = 3.1415926;
 #define GL_DEFINE_SINGLETON(CLASS_NAME)   \
 	CLASS_NAME::CLASS_NAME() {};  \
 	CLASS_NAME & CLASS_NAME::Instance(){\
-	static CLASS_NAME s_instance; \
-	return s_instance;\
+static CLASS_NAME s_instance; \
+return s_instance; \
 	}
+
+#define PHO_DEFINE_SINGLETON_NO_CTOR(CLASS_NAME)  \
+	CLASS_NAME & CLASS_NAME::Instance(){\
+	static CLASS_NAME s_instance;   \
+	return s_instance;  \
+	}
+
 
 #define INITEERROROUT(P) InitOutOf(P)
 #define ERROROUT(P)  ErrorOut(__FILE__,__LINE__,P)
