@@ -15,6 +15,11 @@
 
 class Object{
 public:
+	enum MODEL_TYPE{
+		MODEL_SPHERE,
+		MODEL_MESH,
+	};
+	MODEL_TYPE m_Type;
 	Object() :m_Postion(0.0f, 0.0f, 0.0f){};
 	virtual ~Object() {};
 	virtual void Render(){};
@@ -34,7 +39,7 @@ public:
 	void Init(float r, glm::vec3 &pos, GL_Material &mat);
 	virtual bool InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &dmin);
 	//virtual void Render();
-
+	GL_Material* GetMat(){ return m_Mat; }
 	float m_Raduis;  //°ë¾¶
 
 private:
@@ -50,6 +55,7 @@ public:
 	virtual void Render();
 	virtual bool InterSect(GL_Ray &ray, GL_ObjIntersection &intersection, float &dmin);
 	void SetMaterial(GL_Material &Tmat);
+	std::vector<Triangle*>& GetTris(){ return m_Triangles; }
 	struct ModelEntity{
 
 		GLuint Vb, Ib;
