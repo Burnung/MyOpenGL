@@ -154,3 +154,8 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/Models
+/MyOpenGL/cor_dir_1000.bmp
+*.bmp
+*.txt
+*.deps
