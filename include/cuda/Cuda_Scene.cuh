@@ -1,20 +1,23 @@
-ï»¿#ifndef CUDA_SCENE_CUH
+#ifndef CUDA_SCENE_CUH
 #define CUDA_SCENE_CUH
 
 #include "cuda_Base.cuh"
 
 #include<vector>
 class SphereObj;
-const int MAX_CUDA_KDTRE_DEPTH = 10;    //kdTree
-const int MIN_CUDA_KDTRE_COUNT = 10;    //
+class PHO_ViewPort;
+
+
+const int MAX_CUDA_KDTRE_DEPTH = 10;    //kdTreeµÄ×î´ó²ãÊý
+const int MIN_CUDA_KDTRE_COUNT = 10;    //Ò¶×Ó½ÚµãÈý½ÇÐÎµÄ×îÐ¡ÊýÁ¿
 
 struct CUDA_TreeNode{
-	int  isLeaf;  //Îª1ï¿½ï¿½Ê¾Ò¶ï¿½Ó½Úµï¿½ Îª-1ï¿½ï¿½Ê¾ï¿½Ã½ï¿½ï¿½ï¿½Î´ï¿½ï¿½Ê¹ï¿½ï¿½ Îª 0 Îªï¿½ï¿½Í¨ï¿½Úµï¿½
+	int  isLeaf;  //Îª1±íÊ¾Ò¶×Ó½Úµã Îª-1±íÊ¾¸Ã½áµãÎ´±»Ê¹ÓÃ Îª 0 ÎªÆÕÍ¨½Úµã
 	CUDA_AABB m_AABB;
 	CUDA_Triangle *m_TriList;
-
-	int m_Num;   //ï¿½ï¿½ÎªÒ¶ï¿½Ó½Úµï¿½Ê±ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	int *m_TriIndex;   //Ò¶ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½
+	
+	int m_Num;   //µ±ÎªÒ¶×Ó½ÚµãÊ±±íÊ¾Èý½ÇÐÎÊýÁ¿
+	int *m_TriIndex;   //Ò¶×ÓµÄË÷Òý
 
 	int m_LeftIndex;
 	int m_RightIndex;
@@ -29,47 +32,63 @@ struct CUDA_TreeNode{
 
 struct CUDA_KDTree{
 	CUDA_TreeNode *m_TreeNode;
-	CUDA_Triangle *m_TriList;  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	CUDA_Triangle *m_TriList;  //Èý½ÇÐÎË÷Òý
 	int m_TriNum;
+};
+
+struct Cuda_TracerSet{
+
+	int m_WindowWidth;
+	int m_WindowHeight;
+	glm::vec3 m_CamPos;
+	glm::vec3 m_CamTarVec;
+	glm::vec3 m_CamYVec;
+	glm::vec3 m_CamXVec;
+
+	float m_Width_recp;
+	float m_Height_recp;
+	float m_FovS;
+	float m_Ratio;
+	float m_X_Spacing;
+	float m_X_Spacing_Half;
+	float m_Y_Spacing;
+	float m_Y_Spacing_Half;
+
 };
 class Cuda_Scene{
 
 	GL_DECLARE_SINGLETON(Cuda_Scene);
-
+public:
 	int m_SphereNum;
 	int m_KdTreeNum;
 	int m_MatNum;
-
+	bool AllIsOk;
 	std::vector<Cuda_Sphere*> m_Dev_Spheres;
 	std::vector<CUDA_KDTree*> m_Dev_KdTree;
 	std::vector<CUDA_Triangle*> m_DevTrisList;
 	std::vector<std::vector<int*>> m_allTriIndex;
 
-	Cuda_Material *m_Mat;
 	Cuda_Material *m_Dev_Mat;
+	Cuda_TracerSet *m_Host_Tracer;
+	Cuda_TracerSet *m_Dev_Tracer;
 
-	Cuda_Scene(){
-		m_SphereNum = 0;
-		m_KdTreeNum = 0;
-		m_MatNum = 0;
-		m_Dev_Spheres.resize(0);
-		m_Dev_KdTree.resize(0);
-		m_Dev_Mat = NULL;
-		m_Mat = NULL;
-	}
+	~Cuda_Scene();
+	void SetCudaSceneMat(std::vector<GL_Material*>&);
+	void AddSphere(SphereObj *Sph);
+	void AddKdTree(std::vector<Triangle*>& tris);
+
+	void SetTracer(PHO_ViewPort* tmpView);
+	void UpDateTracer(PHO_ViewPort* tmpView);
+
+	void ReleaseWorld();
+	void GoTrace(int samples);
 };
+
 
 
 __host__ void BuilKdTree(CUDA_KDTree *m_KDTree, CUDA_Triangle* Triangles, int TriNum);
 
-__host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::vector<CUDA_AABB>& allAABB, CUDA_AABB &ALLBound, std::vector<int>&TriIndex, int depth, int NodeIndex);
+__host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::vector<CUDA_AABB>& allAABB, CUDA_AABB &ALLBound, std::vector<int>&TriIndex,int depth,int NodeIndex);
 
-__host__ void CUDA_SetCudaSceneMat(std::vector<GL_Material*>&);
-
-__host__ void CUDA_AddSphere(SphereObj *Sph);
-
-__host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris);
-
-__host__ void ReleaseCudaWorld();
 
 #endif

@@ -1,22 +1,23 @@
-ï»¿#include"Cuda_Scene.cuh"
+#include"Cuda_Scene.cuh"
 #include <helper_cuda.h>
 #include <helper_string.h>
 #include "../model.h"
-#include<iostream>
-
-Cuda_Scene m_CudaScene;
+#include"../PHO_ViewPort.h"
 
 __shared__ int* dev_TriIndex[1 << MAX_CUDA_KDTRE_DEPTH];
+__shared__ CUDA_KDTree* m_devTree[100];
+__shared__ Cuda_Sphere* m_devSphere[100];
+
+PHO_DEFINE_SINGLETON_NO_CTOR(Cuda_Scene);
 
 
-__global__ void SetDevTree(CUDA_KDTree *dev_Tree){
+__global__ void SetDevTree(CUDA_KDTree *dev_Tree, int**TriIndex){
 	unsigned int index = blockIdx.x*blockDim.x + threadIdx.x;
 
 	if (index >= (1 << MAX_CUDA_KDTRE_DEPTH))
 		return;
-	//printf("%d %d\n", index,index);
 	if (dev_Tree->m_TreeNode[index].isLeaf == 1){
-		dev_Tree->m_TreeNode[index].m_TriIndex = dev_TriIndex[index];
+		dev_Tree->m_TreeNode[index].m_TriIndex = TriIndex[index];
 		dev_Tree->m_TreeNode[index].m_TriList = dev_Tree->m_TriList;
 		printf("%d %d\n", index, dev_Tree->m_TreeNode[index].m_Num);
 	}
@@ -43,27 +44,27 @@ __host__ void BuilKdTree(CUDA_KDTree *m_KDTree, CUDA_Triangle* Triangles, int Tr
 
 	m_KDTree->m_TriNum = TriNum;
 	m_KDTree->m_TriList = Triangles;
-	//
-	//
+	//¿ªÊ¼¹¹½¨kdtree
+	 //µÃµ½Ã¿¸öÈý½ÇÐÎµÄ°üÎ§ºÐ
 	std::vector<CUDA_AABB> m_AABB(TriNum);
 	for (int i = 0; i < TriNum; i++)
 		m_AABB[i] = GetAABBFromTri(Triangles[i]);
-	//
+	//¹¹½¨×ÜµÄ°üÎ§ºÐ
 	CUDA_AABB AllBound = m_AABB[0];
 	for (int i = 1; i < TriNum; i++)
 		ExpandBox(AllBound, m_AABB[i]);
-	//
+	//½¨Á¢È«Ë÷Òý
 	std::vector<int> triIndx(TriNum);
 	for (int i = 0; i < TriNum; i++)
 		triIndx[i] = i;
 
-
+	//µÝ¹é¹¹½¨
 	buildKdNode(m_KDTree->m_TreeNode, Triangles, m_AABB, AllBound, triIndx, 1, 0);
 
 }
 __host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::vector<CUDA_AABB>& allAABB, CUDA_AABB &ALLBound, std::vector<int>&TriIndex, int depth, int NodeIndex){
 	kdNode[NodeIndex].m_AABB = ALLBound;
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò¶ï¿½Ó½Úµï¿½
+	//·ûºÏÌõ¼þµÄÒ¶×Ó½Úµã
 	if (depth >= MAX_CUDA_KDTRE_DEPTH || TriIndex.size() <= MIN_CUDA_KDTRE_COUNT){
 		kdNode[NodeIndex].isLeaf = true;
 		kdNode[NodeIndex].m_Num = TriIndex.size();
@@ -104,7 +105,7 @@ __host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::
 
 	CUDA_AABB rightAABB = allAABB[rightIndex[0]];
 	for (int i = 1; i < rightIndex.size(); i++)
-		ExpandBox(rightAABB, allAABB[rightIndex[i]]);
+		ExpandBox(rightAABB,allAABB[rightIndex[i]]);
 
 	kdNode[NodeIndex].m_LeftIndex = 2 * NodeIndex + 1;
 	buildKdNode(kdNode, Triangles, allAABB, leftAABB, leftIndex, depth + 1, kdNode[NodeIndex].m_LeftIndex);
@@ -114,45 +115,58 @@ __host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::
 
 }
 
-__host__ void CUDA_SetCudaSceneMat(std::vector<GL_Material*> &mats){
-	m_CudaScene.m_MatNum = mats.size();
-	m_CudaScene.m_Mat = new Cuda_Material[m_CudaScene.m_MatNum];
-	for (int i = 0; i < mats.size(); i++)
-		m_CudaScene.m_Mat[i] = GetCudaMatFromMat(mats[i]);
-
-	checkCudaErrors(cudaMalloc((void **)&(m_CudaScene.m_Dev_Mat), mats.size() * sizeof(Cuda_Material)));
-	checkCudaErrors(cudaMemcpy(m_CudaScene.m_Dev_Mat, m_CudaScene.m_Mat, mats.size()&sizeof(Cuda_Material), cudaMemcpyHostToDevice));
-
-	delete[] m_CudaScene.m_Mat;
-	m_CudaScene.m_Mat = NULL;
+Cuda_Scene::Cuda_Scene(){
+	m_SphereNum = 0;
+	m_KdTreeNum = 0;
+	m_MatNum = 0;
+	m_Dev_Spheres.resize(0);
+	m_Dev_KdTree.resize(0);
+	m_Host_Tracer = NULL;
+	m_Dev_Tracer = NULL;
+	m_Dev_Mat = NULL;
+	AllIsOk = false;
 }
-__host__ void CUDA_AddSphere(SphereObj *Sph){
-	// cuda_spherer
+
+Cuda_Scene::~Cuda_Scene(){
+	ReleaseWorld();
+}
+
+void Cuda_Scene::SetCudaSceneMat(std::vector<GL_Material*>&mats){
+	m_MatNum = mats.size();
+	Cuda_Material *TmpMat;
+	TmpMat = new Cuda_Material[m_MatNum];
+	for (int i = 0; i < m_MatNum; i++)
+		TmpMat[i] = GetCudaMatFromMat(mats[i]);
+	checkCudaErrors(cudaMalloc((void **)&(m_Dev_Mat), mats.size() * sizeof(Cuda_Material)));
+	checkCudaErrors(cudaMemcpy(m_Dev_Mat, TmpMat, mats.size()&sizeof(Cuda_Material), cudaMemcpyHostToDevice));
+	delete[] TmpMat;
+
+}
+void Cuda_Scene::AddSphere(SphereObj *Sph){
+	//Éú³É cuda_spherer
 	Cuda_Sphere* tmpSphere = new Cuda_Sphere;// GetSphereFromObj(Sph);
 
-	
+	//½«Æä¿½±´ÖÁGPU
 	Cuda_Sphere *tmp_dev_Sph;
 	checkCudaErrors(cudaMalloc((void**)&tmp_dev_Sph, sizeof(Cuda_Sphere)));
 	checkCudaErrors(cudaMemcpy(tmp_dev_Sph, tmpSphere, sizeof(Cuda_Sphere), cudaMemcpyHostToDevice));
 
-	m_CudaScene.m_Dev_Spheres.push_back(tmp_dev_Sph);
+	m_Dev_Spheres.push_back(tmp_dev_Sph);
 
 	delete tmpSphere;
 }
 
-__host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris){
-	//ï¿½ï¿½ï¿½ï¿½cudaTri
-	std::cout << tris.size() << std::endl;
+void Cuda_Scene::AddKdTree(std::vector<Triangle*>& tris){
 	CUDA_Triangle *cudaTris = new CUDA_Triangle[tris.size()];
 	for (int i = 0; i < tris.size(); i++){
 		GetCudaTrifromTri(cudaTris[i], tris[i]);
 	}
 
 	CUDA_KDTree *hostTree = new CUDA_KDTree;
-	//ï¿½ï¿½cpuï¿½ï¿½ï¿½ï¿½kdtree
+	//ÔÚcpu¹¹Ôìkdtree
 	BuilKdTree(hostTree, cudaTris, tris.size());
 
-	//ï¿½ï¿½gupï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
+	//ÔÚgupÉêÇëÄÚ´æ
 	CUDA_Triangle *dev_cudaTris;
 	CUDA_KDTree *dev_cudaTree;
 	checkCudaErrors(cudaMalloc((void**)&dev_cudaTris, sizeof(CUDA_Triangle)*tris.size()));
@@ -172,7 +186,7 @@ __host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris){
 	hostTree->m_TriList = cudaTris;
 	hostTree->m_TreeNode = tmpTreeNode;
 
-	//
+	//Èý½ÇÐÎË÷Òý
 	std::vector<int*> tmpindex;
 	for (int i = 0; i < (1 << MAX_CUDA_KDTRE_DEPTH); i++){
 		dev_TriIndex[i] = NULL;
@@ -182,49 +196,110 @@ __host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris){
 			tmpindex.push_back(dev_TriIndex[i]);
 		}
 	}
-	m_CudaScene.m_allTriIndex.push_back(tmpindex);
+	m_allTriIndex.push_back(tmpindex);
 
 	dim3 dimBlock(32, 1, 1);
 	dim3 dimGrid((1 << (MAX_CUDA_KDTRE_DEPTH)) / dimBlock.x + 1, 1, 1);
 
 	int y = 1024 / 8;
 
-	SetDevTree << < 8, y, 1 >> >(dev_tree);
+	SetDevTree << < 8, y, 1 >> >(dev_tree, dev_TriIndex);
 
 	ReleaseHostTree(hostTree);
 
-	m_CudaScene.m_DevTrisList.push_back(dev_cudaTris);
-	m_CudaScene.m_Dev_KdTree.push_back(dev_tree);
-
-	ReleaseCudaWorld();
-
+	m_DevTrisList.push_back(dev_cudaTris);
+	m_Dev_KdTree.push_back(dev_tree);
 }
 
-__host__ void ReleaseCudaTree(CUDA_KDTree *dev_tree){
-	dim3 dimBlock(16, 16, 1);
-	dim3 dimGrid((1 << (MAX_CUDA_KDTRE_DEPTH / 2)) / dimBlock.x + 1, (1 << (MAX_CUDA_KDTRE_DEPTH / 2)) / dimBlock.y + 1, 1);
-
-}
-
-__host__ void ReleaseCudaWorld(){
-	for (auto item : m_CudaScene.m_Dev_Spheres)
+void Cuda_Scene::ReleaseWorld(){
+	for (auto item : m_Dev_Spheres)
 		cudaFree(item);
-	for (auto item : m_CudaScene.m_allTriIndex){
+	for (auto item : m_allTriIndex){
 		for (auto litem : item)
 			cudaFree(litem);
 		item.clear();
 	}
-	for (auto item : m_CudaScene.m_Dev_KdTree){
+	for (auto item : m_Dev_KdTree){
 		cudaFree(item);
 	}
-	for (auto item : m_CudaScene.m_DevTrisList)
+	for (auto item : m_DevTrisList)
 		cudaFree(item);
 
-	cudaFree(m_CudaScene.m_Dev_Mat);
+	delete(m_Host_Tracer);
+	cudaFree(m_Dev_Mat);
+	cudaFree(m_Dev_Tracer);
 
-	m_CudaScene.m_Dev_Spheres.clear();
-	m_CudaScene.m_DevTrisList.clear();
-	m_CudaScene.m_Dev_Spheres.clear();
-	m_CudaScene.m_allTriIndex.clear();
+
+	m_Dev_Spheres.clear();
+	m_DevTrisList.clear();
+	m_Dev_Spheres.clear();
+	m_allTriIndex.clear();
+}
+void Cuda_Scene::SetTracer(PHO_ViewPort* tmpView){
+
+	//ÎªdevÉêÇëÄÚ´æ
+	checkCudaErrors(cudaMalloc((void**)&m_Dev_Tracer, sizeof(Cuda_TracerSet)));
+
+	m_Host_Tracer->m_WindowWidth = tmpView->GetWidth();
+	m_Host_Tracer->m_WindowHeight = tmpView->GetHeight();
+
+	//ÉèÖÃÉú³É¹âÏßÊ±µÄÒ»Ð©²ÎÊý
+	m_Host_Tracer->m_Width_recp = 1.0f / (m_Host_Tracer->m_WindowWidth *1.0f);
+	m_Host_Tracer->m_Height_recp = 1.0f / (m_Host_Tracer->m_WindowHeight *1.0f);
+	m_Host_Tracer->m_Ratio = (m_Host_Tracer->m_WindowWidth *1.0f) / (m_Host_Tracer->m_WindowHeight *1.0f);
+
+	m_Host_Tracer->m_FovS = 1.0 / tanf(tmpView->GetFovy() * 0.5);
+	m_Host_Tracer->m_X_Spacing = m_Host_Tracer->m_Width_recp * (m_Host_Tracer->m_Ratio) * (m_Host_Tracer->m_FovS);
+	m_Host_Tracer->m_Y_Spacing = m_Host_Tracer->m_Height_recp * (m_Host_Tracer->m_FovS);
+	m_Host_Tracer->m_X_Spacing_Half = m_Host_Tracer->m_X_Spacing * 0.5f;
+	m_Host_Tracer->m_Y_Spacing_Half = m_Host_Tracer->m_Y_Spacing * 0.5f;
+	UpDateTracer(tmpView);
+
+}
+void Cuda_Scene::UpDateTracer(PHO_ViewPort* tmpView){
+	m_Host_Tracer->m_CamPos = tmpView->GetCameraPos();
+	m_Host_Tracer->m_CamTarVec = glm::normalize(tmpView->GetCameraLookVec());
+	m_Host_Tracer->m_CamYVec = glm::normalize(tmpView->GetCameraUpVec());
+	//¼ÆËãË®Æ½ºÍ´¹Ö±·½Ïò¡£¡£ x,y,z ÒÀ´Î¼´¿É
+	m_Host_Tracer->m_CamXVec = glm::cross(m_Host_Tracer->m_CamYVec, m_Host_Tracer->m_CamTarVec);
+	m_Host_Tracer->m_CamXVec = glm::normalize(m_Host_Tracer->m_CamXVec);
+
+	m_Host_Tracer->m_CamYVec = glm::normalize(glm::cross(m_Host_Tracer->m_CamTarVec, m_Host_Tracer->m_CamXVec));
+
+	checkCudaErrors(cudaMemcpy(m_Dev_Tracer, m_Host_Tracer, sizeof(Cuda_TracerSet), cudaMemcpyHostToDevice));
+
+
+}
+
+
+__global__ void TraceAll(Cuda_TracerSet *m_Tracer, int samples){
+
+	int nSamples = blockDim.x * blockIdx.y + blockIdx.x;
+	if (nSamples >= samples)
+		return;
+	int x = threadIdx.x;
+	int y = threadIdx.y;
+	CUDA_Ray ray;
+
+
+	
+}
+
+
+void Cuda_Scene::GoTrace(int samples){
+	if (!AllIsOk){
+		for (int i = 0; i < m_Dev_Spheres.size(); i++)
+			m_devSphere[i] = m_Dev_Spheres[i];
+		for (int i = 0; i < m_Dev_KdTree.size(); i++)
+			m_devTree[i] = m_Dev_KdTree[i];
+		AllIsOk = true;
+	}
+
+	dim3 dimBlock(4,samples/4+1 , 1);
+	dim3 dimGrid(m_Host_Tracer->m_WindowWidth, m_Host_Tracer->m_WindowHeight);
+
+
+
+
 
 }
