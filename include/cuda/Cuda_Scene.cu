@@ -1,20 +1,22 @@
-#include"Cuda_Scene.cuh"
+ï»¿#include"Cuda_Scene.cuh"
 #include <helper_cuda.h>
 #include <helper_string.h>
 #include "../model.h"
+#include<iostream>
 
 Cuda_Scene m_CudaScene;
 
 __shared__ int* dev_TriIndex[1 << MAX_CUDA_KDTRE_DEPTH];
 
 
-__global__ void SetDevTree(CUDA_KDTree *dev_Tree, int**TriIndex){
+__global__ void SetDevTree(CUDA_KDTree *dev_Tree){
 	unsigned int index = blockIdx.x*blockDim.x + threadIdx.x;
 
 	if (index >= (1 << MAX_CUDA_KDTRE_DEPTH))
 		return;
+	//printf("%d %d\n", index,index);
 	if (dev_Tree->m_TreeNode[index].isLeaf == 1){
-		dev_Tree->m_TreeNode[index].m_TriIndex = TriIndex[index];
+		dev_Tree->m_TreeNode[index].m_TriIndex = dev_TriIndex[index];
 		dev_Tree->m_TreeNode[index].m_TriList = dev_Tree->m_TriList;
 		printf("%d %d\n", index, dev_Tree->m_TreeNode[index].m_Num);
 	}
@@ -41,27 +43,27 @@ __host__ void BuilKdTree(CUDA_KDTree *m_KDTree, CUDA_Triangle* Triangles, int Tr
 
 	m_KDTree->m_TriNum = TriNum;
 	m_KDTree->m_TriList = Triangles;
-	//¿ªÊ¼¹¹½¨kdtree
-	 //µÃµ½Ã¿¸öÈý½ÇÐÎµÄ°üÎ§ºÐ
+	//
+	//
 	std::vector<CUDA_AABB> m_AABB(TriNum);
 	for (int i = 0; i < TriNum; i++)
 		m_AABB[i] = GetAABBFromTri(Triangles[i]);
-	//¹¹½¨×ÜµÄ°üÎ§ºÐ
+	//
 	CUDA_AABB AllBound = m_AABB[0];
 	for (int i = 1; i < TriNum; i++)
 		ExpandBox(AllBound, m_AABB[i]);
-	//½¨Á¢È«Ë÷Òý
+	//
 	std::vector<int> triIndx(TriNum);
 	for (int i = 0; i < TriNum; i++)
 		triIndx[i] = i;
 
-	//µÝ¹é¹¹½¨
+
 	buildKdNode(m_KDTree->m_TreeNode, Triangles, m_AABB, AllBound, triIndx, 1, 0);
 
 }
 __host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::vector<CUDA_AABB>& allAABB, CUDA_AABB &ALLBound, std::vector<int>&TriIndex, int depth, int NodeIndex){
 	kdNode[NodeIndex].m_AABB = ALLBound;
-	//·ûºÏÌõ¼þµÄÒ¶×Ó½Úµã
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò¶ï¿½Ó½Úµï¿½
 	if (depth >= MAX_CUDA_KDTRE_DEPTH || TriIndex.size() <= MIN_CUDA_KDTRE_COUNT){
 		kdNode[NodeIndex].isLeaf = true;
 		kdNode[NodeIndex].m_Num = TriIndex.size();
@@ -102,7 +104,7 @@ __host__ void buildKdNode(CUDA_TreeNode* kdNode, CUDA_Triangle* Triangles, std::
 
 	CUDA_AABB rightAABB = allAABB[rightIndex[0]];
 	for (int i = 1; i < rightIndex.size(); i++)
-		ExpandBox(rightAABB,allAABB[rightIndex[i]]);
+		ExpandBox(rightAABB, allAABB[rightIndex[i]]);
 
 	kdNode[NodeIndex].m_LeftIndex = 2 * NodeIndex + 1;
 	buildKdNode(kdNode, Triangles, allAABB, leftAABB, leftIndex, depth + 1, kdNode[NodeIndex].m_LeftIndex);
@@ -125,10 +127,10 @@ __host__ void CUDA_SetCudaSceneMat(std::vector<GL_Material*> &mats){
 	m_CudaScene.m_Mat = NULL;
 }
 __host__ void CUDA_AddSphere(SphereObj *Sph){
-	//Éú³É cuda_spherer
+	// cuda_spherer
 	Cuda_Sphere* tmpSphere = new Cuda_Sphere;// GetSphereFromObj(Sph);
+
 	
-	//½«Æä¿½±´ÖÁGPU
 	Cuda_Sphere *tmp_dev_Sph;
 	checkCudaErrors(cudaMalloc((void**)&tmp_dev_Sph, sizeof(Cuda_Sphere)));
 	checkCudaErrors(cudaMemcpy(tmp_dev_Sph, tmpSphere, sizeof(Cuda_Sphere), cudaMemcpyHostToDevice));
@@ -139,26 +141,27 @@ __host__ void CUDA_AddSphere(SphereObj *Sph){
 }
 
 __host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris){
-	//Éú³ÉcudaTri
+	//ï¿½ï¿½ï¿½ï¿½cudaTri
+	std::cout << tris.size() << std::endl;
 	CUDA_Triangle *cudaTris = new CUDA_Triangle[tris.size()];
 	for (int i = 0; i < tris.size(); i++){
 		GetCudaTrifromTri(cudaTris[i], tris[i]);
 	}
 
 	CUDA_KDTree *hostTree = new CUDA_KDTree;
-	//ÔÚcpu¹¹Ôìkdtree
+	//ï¿½ï¿½cpuï¿½ï¿½ï¿½ï¿½kdtree
 	BuilKdTree(hostTree, cudaTris, tris.size());
 
-	//ÔÚgupÉêÇëÄÚ´æ
+	//ï¿½ï¿½gupï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 	CUDA_Triangle *dev_cudaTris;
 	CUDA_KDTree *dev_cudaTree;
 	checkCudaErrors(cudaMalloc((void**)&dev_cudaTris, sizeof(CUDA_Triangle)*tris.size()));
-	checkCudaErrors(cudaMemcpy(dev_cudaTris, cudaTris, sizeof(CUDA_Triangle)*tris.size(),cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(dev_cudaTris, cudaTris, sizeof(CUDA_Triangle)*tris.size(), cudaMemcpyHostToDevice));
 
 	CUDA_TreeNode *dev_treeNode;
 	checkCudaErrors(cudaMalloc((void**)&dev_treeNode, sizeof(CUDA_TreeNode)*(1 << MAX_CUDA_KDTRE_DEPTH)));
 	checkCudaErrors(cudaMemcpy(dev_treeNode, hostTree->m_TreeNode, sizeof(CUDA_TreeNode)*(1 << MAX_CUDA_KDTRE_DEPTH), cudaMemcpyHostToDevice));
-	
+
 	//kdtree
 	CUDA_KDTree *dev_tree;
 	checkCudaErrors(cudaMalloc((void**)&dev_tree, sizeof(CUDA_KDTree)));
@@ -169,7 +172,7 @@ __host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris){
 	hostTree->m_TriList = cudaTris;
 	hostTree->m_TreeNode = tmpTreeNode;
 
-	//Èý½ÇÐÎË÷Òý
+	//
 	std::vector<int*> tmpindex;
 	for (int i = 0; i < (1 << MAX_CUDA_KDTRE_DEPTH); i++){
 		dev_TriIndex[i] = NULL;
@@ -182,11 +185,11 @@ __host__ void CUDA_AddKdTree(std::vector<Triangle*>& tris){
 	m_CudaScene.m_allTriIndex.push_back(tmpindex);
 
 	dim3 dimBlock(32, 1, 1);
-	dim3 dimGrid((1 << (MAX_CUDA_KDTRE_DEPTH )) / dimBlock.x + 1,1, 1);
+	dim3 dimGrid((1 << (MAX_CUDA_KDTRE_DEPTH)) / dimBlock.x + 1, 1, 1);
 
-	int y = 1024/8;
+	int y = 1024 / 8;
 
-	SetDevTree << < 8, y, 1 >> >(dev_tree, dev_TriIndex);
+	SetDevTree << < 8, y, 1 >> >(dev_tree);
 
 	ReleaseHostTree(hostTree);
 

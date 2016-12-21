@@ -68,7 +68,7 @@ public:
 		m_ViewPort->InitCamera();
 		m_ViewPort->SetFovy(90);
 		PHO_Random::Instance().Init();
-		PHO_PahtTracer::Instance().Init(m_ViewPort);
+
 		SphereObj *spheres[] = {//Scene: radius, position, emission, color, material
 			//Master
 			new SphereObj(1000, glm::vec3(0, 0, -1000), GL_Material(glm::vec3(0, 0, 0), glm::vec3(1.0f,1.0f,1.0f), DIFF)),//Left
@@ -96,7 +96,8 @@ public:
 		tmpModel->SetMaterial(GL_Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.9999f, 0.9999f, 0.9999f), REFR));
 		GL_Scene::Instance().addObject(tmpModel);
 		for (auto item : spheres)
-			;// GL_Scene::Instance().addObject(item);
+			GL_Scene::Instance().addObject(item);
+		PHO_PahtTracer::Instance().Init(m_ViewPort);
 		time(&m_start);
 		std::cout << "now is tracing" << std::endl;
 	//	PHO_PahtTracer::Instance().GoTrace(600);

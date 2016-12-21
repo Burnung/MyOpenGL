@@ -1,4 +1,5 @@
 #include"GL_ComputShader.h"
+#include<gl\glew.h>
 #include"gl_util.h"
 #include<string>
 #include<iostream>

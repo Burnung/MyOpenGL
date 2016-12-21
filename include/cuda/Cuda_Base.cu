@@ -1,4 +1,4 @@
-#include "cuda_Base.cuh"
+ï»¿#include "cuda_Base.cuh"
 #include <helper_cuda.h>
 
 #include "../model.h"
@@ -33,16 +33,17 @@ __host__ void ExpandBox(CUDA_AABB &ret, CUDA_AABB &tmp){
 
 __host__ int GetMaxAxi(CUDA_AABB &aabb, float &MidPos){
 	glm::vec3 Diff = aabb.m_MaxPos - aabb.m_MinPos;
+	glm::vec3 MidVPos = (aabb.m_MaxPos + aabb.m_MinPos) * 0.5f;
 	if (Diff.x > Diff.y && Diff.x > Diff.z){
-		MidPos = Diff.x * 0.5;
+		MidPos = MidVPos.x;
 		return X_AXIS;
 	}
 	else if (Diff.y > Diff.z){
-		MidPos = Diff.y * 0.5;
+		MidPos = MidVPos.y;
 		return Y_AXIS;
 	}
 	else{
-		MidPos = Diff.z * 0.5;
+		MidPos = MidVPos.z;
 		return Z_AXIS;
 	}
 	return X_AXIS;
@@ -53,7 +54,7 @@ __host__ Cuda_Material GetCudaMatFromMat(GL_Material*mat){
 	ret.m_RenderType = mat->m_RenderType;
 	ret.m_MaterialType = mat->m_MaterialType;
 
-	ret.m_Refra = mat->m_Refra; //ÕÛÉäÂÊ  ´óÓÚµÈÓÚ1
+	ret.m_Refra = mat->m_Refra; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½1
 	ret.m_colour = mat->m_colour;
 	ret.m_emission = mat->m_emission;
 	return ret;

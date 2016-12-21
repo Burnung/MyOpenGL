@@ -39,7 +39,7 @@ void PHO_PahtTracer::Init(PHO_ViewPort *ViewPort){
 	m_RetBMP = new BYTE[m_WindowHeight * m_WindowWidth * 3];
 
 #ifdef PATHTRACER_USE_GPU
-
+	GL_Scene::Instance().PutSceneToCuda();
 #endif
 }
 
