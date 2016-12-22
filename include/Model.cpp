@@ -4,6 +4,7 @@
 
 
 Model::Model() :m_kdTree(nullptr), m_WholeMaterial(nullptr), IsSameMat(false){
+	Object::m_Type = MODEL_MESH;
 	m_Entities.clear();
 	m_Materials.clear();
 	m_Triangles.clear();
@@ -259,9 +260,11 @@ void Model::SetMaterial(GL_Material &Tmat){
 }
 
 SphereObj::SphereObj() : m_Mat(nullptr), m_Raduis(0.0f){
+	Object::m_Type = Object::MODEL_SPHERE;
 	//m_Mat = new GL_Material();
 }
 SphereObj::SphereObj(float r, glm::vec3 &pos, GL_Material &mat){
+	Object::m_Type = Object::MODEL_SPHERE;
 	m_Raduis = r;
 	setPos(pos);
 	m_Mat = new GL_Material(mat);

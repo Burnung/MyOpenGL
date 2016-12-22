@@ -1,4 +1,4 @@
-
+ï»¿
 #ifndef CUDA_BASE_CUH
 #define CUDA_BASE_CUH
 #include <device_launch_parameters.h>
@@ -20,15 +20,15 @@ enum AXIS{
 /*
 struct CUDA_Vertex{
 
-	glm::vec3 pos;
-	glm::vec3 normal;
-	glm::vec2 uv;
+glm::vec3 pos;
+glm::vec3 normal;
+glm::vec2 uv;
 
 
-	CUDA_Vertex() :pos(glm::vec3(0, 0, 0)), normal(glm::vec3(0, 0, -1)), uv(glm::vec2(0, 0)){};
-	CUDA_Vertex(glm::vec3 pos_, glm::vec3 normal_, glm::vec2 uv_) :pos(pos_), normal(glm::normalize(normal_)), uv(uv_)
-	{
-	}
+CUDA_Vertex() :pos(glm::vec3(0, 0, 0)), normal(glm::vec3(0, 0, -1)), uv(glm::vec2(0, 0)){};
+CUDA_Vertex(glm::vec3 pos_, glm::vec3 normal_, glm::vec2 uv_) :pos(pos_), normal(glm::normalize(normal_)), uv(uv_)
+{
+}
 };*/
 
 struct CUDA_Ray{
@@ -49,7 +49,7 @@ struct Cuda_Intersction{
 };
 
 struct CUDA_AABB{
-	glm::vec3 m_MinPos, m_MaxPos;  //×î´óµãºÍ×îÐ¡µã
+	glm::vec3 m_MinPos, m_MaxPos;  //
 	CUDA_AABB(glm::vec3 &MinPos, glm::vec3& MaxPos) : m_MinPos(MinPos), m_MaxPos(MaxPos){
 	};
 	CUDA_AABB(){
@@ -60,7 +60,7 @@ struct CUDA_AABB{
 };
 
 struct Cuda_Sphere{
-	glm::vec3 m_Center;        //ÇòÐÄ
+	glm::vec3 m_Center;        //ï¿½ï¿½ï¿½ï¿½
 	float m_Radius;
 	int m_MatIndex;
 	Cuda_Sphere(glm::vec3 Center, float radius) :m_Center(Center), m_Radius(radius){};
@@ -75,7 +75,7 @@ struct Cuda_Material{
 
 	RenderType m_RenderType;
 	MaterialType m_MaterialType;
-	float m_Refra;  //ÕÛÉäÂÊ  ´óÓÚµÈÓÚ1
+	float m_Refra;  //
 	glm::vec3 m_colour;
 	glm::vec3 m_emission;
 
@@ -88,9 +88,9 @@ struct Cuda_Material{
 };
 
 struct CUDA_Triangle{
-	Vertex m_p1, m_p2, m_p3;   //°´Ë³ÐòµÄÈý½ÇÐÎ
-	glm::vec3 m_Normal;        //Èý½ÇÐÎµÄ·¨Ïß
-	int m_MatIndex;    //²ÄÖÊË÷Òý
+	Vertex m_p1, m_p2, m_p3;   //ï¿½ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	glm::vec3 m_Normal;        //ï¿½ï¿½ï¿½ï¿½ï¿½ÎµÄ·ï¿½ï¿½ï¿½
+	int m_MatIndex;    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	glm::vec3 m_MidPoint;
 	//int m_id;
 };
@@ -99,7 +99,7 @@ struct CUDA_Triangle{
 __host__ void CUDA_InitCuda();
 __host__ CUDA_AABB GetAABBFromTri(CUDA_Triangle& tri);
 __host__ void ExpandBox(CUDA_AABB &ret, CUDA_AABB &tmp);
-__host__ int GetMaxAxi(CUDA_AABB &aabb,float &MidPos);
+__host__ int GetMaxAxi(CUDA_AABB &aabb, float &MidPos);
 __host__ Cuda_Material GetCudaMatFromMat(GL_Material*);
 __host__ Cuda_Sphere* GetSphereFromObj(SphereObj*);
 __host__ void GetCudaTrifromTri(CUDA_Triangle &cuda_tri, Triangle* tri);

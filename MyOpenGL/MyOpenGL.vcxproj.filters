@@ -1,133 +1,134 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="资源文件">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="源文件\Mylib">
-      <UniqueIdentifier>{3f43d386-e091-42dd-8d9e-775987d2fb90}</UniqueIdentifier>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="源文件\Mylib\Head">
-      <UniqueIdentifier>{8bb8a5d6-56c2-4184-8348-4ed38f5e2049}</UniqueIdentifier>
+    <Filter Include="源文件\MyLib">
+      <UniqueIdentifier>{8ad9d664-fc84-49af-83e2-25332d2aa4d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Mylib\Cuda">
-      <UniqueIdentifier>{34e90031-6bbc-4ccb-b666-87ac19c6d835}</UniqueIdentifier>
+    <Filter Include="源文件\MyLib\头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="源文件\MyLib\Cuda">
+      <UniqueIdentifier>{ff356b1d-8f83-48c0-bf28-ec465ea6f23c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\include\Camera.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_BaseType.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_Blend.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_ComputShader.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_Fbo.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_Frame.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_kdTree.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_Scene.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\GL_Shader.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\gl_util.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\Model.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\PHO_PathTracer.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\PHO_Random.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\PHO_ViewPortcpp.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\include\Quaternion.cpp">
-      <Filter>源文件\Mylib</Filter>
+      <Filter>源文件\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\Camera.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GL_BaseType.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GL_Blend.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GL_ComputShader.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GL_Fbo.h">
-      <Filter>源文件\Mylib\Head</Filter>
+    <ClInclude Include="..\include\gl_util.h">
+      <Filter>源文件\MyLib\头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\GL_Frame.h">
-      <Filter>源文件\Mylib\Head</Filter>
+      <Filter>源文件\MyLib\头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\GL_kdTree.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GL_Scene.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GL_Shader.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gl_util.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\Model.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\PHO_PathTracer.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\PHO_Random.h">
-      <Filter>源文件\Mylib\Head</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\PHO_ViewPort.h">
-      <Filter>源文件\Mylib\Head</Filter>
+    <ClInclude Include="..\include\Camera.h">
+      <Filter>源文件\MyLib\头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Quaternion.h">
-      <Filter>源文件\Mylib\Head</Filter>
+      <Filter>源文件\MyLib\头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\cuda\cuda_Base.cuh">
-      <Filter>源文件\Mylib\Cuda</Filter>
+    <ClInclude Include="..\include\Model.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_ComputShader.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_Shader.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_Blend.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_Fbo.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_BaseType.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_kdTree.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GL_Scene.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\PHO_ViewPort.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\PHO_PathTracer.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\PHO_Random.h">
+      <Filter>源文件\MyLib\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cuda\cuda_base.cuh">
+      <Filter>源文件\MyLib\Cuda</Filter>
     </ClInclude>
     <ClInclude Include="..\include\cuda\Cuda_Scene.cuh">
-      <Filter>源文件\Mylib\Cuda</Filter>
+      <Filter>源文件\MyLib\Cuda</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\include\cuda\Cuda_Base.cu">
-      <Filter>源文件\Mylib\Cuda</Filter>
+      <Filter>源文件\MyLib\Cuda</Filter>
     </CudaCompile>
     <CudaCompile Include="..\include\cuda\Cuda_Scene.cu">
-      <Filter>源文件\Mylib\Cuda</Filter>
+      <Filter>源文件\MyLib\Cuda</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

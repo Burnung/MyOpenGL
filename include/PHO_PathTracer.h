@@ -6,7 +6,7 @@
 #include"GL_BaseType.h"
 
 #include"PHO_Random.h"
-//#define PATHTRACER_USE_GPU   //是否使用GPU加速
+#define PATHTRACER_USE_GPU   //是否使用GPU加速
 
 class PHO_ViewPort;
 class PHO_PahtTracer{
