@@ -77,7 +77,7 @@ glm::vec3 GL_Scene::GoTrace(GL_Ray &ray,int n_depth){
 	float Col_Max = std::max(std::max(T_Col.r, T_Col.g), T_Col.b);
 	if (n_depth >= PHO_PahtTracer::Instance().GetMaxDepth()){
 		if (Col_Max < PHO_Random::Instance().GetDouble())
-			return glm::vec3(0, 0, 0);// tMat->m_colour;
+			return T_Col;// tMat->m_colour;  //cuole 
 		T_Col *= (1.0f / Col_Max);
 	}
 	//光线可能是在模型内部传递

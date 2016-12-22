@@ -19,7 +19,7 @@ struct Vertex{
 
 
 	Vertex() :pos(glm::vec3(0, 0, 0)), normal(glm::vec3(0,0,-1)),uv(glm::vec2(0,0)){};
-	Vertex(glm::vec3 pos_, glm::vec3 normal_, glm::vec2 uv_) :pos(pos_), normal(glm::normalize(normal_)), uv(uv_)
+	 Vertex(glm::vec3 pos_, glm::vec3 normal_, glm::vec2 uv_) :pos(pos_), normal(glm::normalize(normal_)), uv(uv_)
 	{
 	}
 

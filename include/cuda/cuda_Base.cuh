@@ -34,11 +34,11 @@ struct CUDA_Vertex{
 struct CUDA_Ray{
 	glm::vec3 m_Origin;
 	glm::vec3 m_Dirction;
-	CUDA_Ray(glm::vec3 or, glm::vec3 dir) :m_Origin(or), m_Dirction(dir){};
-	CUDA_Ray(){
+	//CUDA_Ray(glm::vec3 or, glm::vec3 dir) :m_Origin(or), m_Dirction(dir){};
+	/*CUDA_Ray(){
 		m_Origin = glm::vec3(0.0f);
 		m_Dirction = glm::vec3(0.0f, 0.0f, -1.0f);
-	}
+	}*/
 };
 
 struct Cuda_Intersction{
@@ -46,10 +46,6 @@ struct Cuda_Intersction{
 	float m_Dis;
 	int m_MatID;
 	Vertex m_Vertex;
-	Cuda_Intersction();
-
-	Cuda_Intersction(bool, Vertex&, Vertex&, float);
-	Cuda_Intersction& operator= (Cuda_Intersction&);
 };
 
 struct CUDA_AABB{
@@ -76,7 +72,7 @@ struct Cuda_Sphere{
 
 
 struct Cuda_Material{
-public:
+
 	RenderType m_RenderType;
 	MaterialType m_MaterialType;
 	float m_Refra;  //折射率  大于等于1
@@ -108,7 +104,12 @@ __host__ Cuda_Material GetCudaMatFromMat(GL_Material*);
 __host__ Cuda_Sphere* GetSphereFromObj(SphereObj*);
 __host__ void GetCudaTrifromTri(CUDA_Triangle &cuda_tri, Triangle* tri);
 __host__ glm::vec3 ComputTriMidPoint(CUDA_Triangle& tri);
-__device__  bool IntersectWithAABB(CUDA_Ray &ray, float &dis, float min);
+
+__device__  bool IntersectWithAABB(CUDA_Ray *ray,CUDA_AABB* m_AABB, float tMin);
+__device__ bool IntersectWithTri(CUDA_Ray *ray, CUDA_Triangle* m_AABB, float &u, float &v, float& Dis, float tMin);
+__device__ void ComVertexFromTriUV(float u, float v, CUDA_Triangle* tri ,Vertex *ret);
+__device__ float FloatMin(float m1, float m2);
+__device__ float FloatMax(float m1, float m2);
 
 
 

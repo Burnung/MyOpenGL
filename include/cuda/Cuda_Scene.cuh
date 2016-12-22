@@ -2,7 +2,7 @@
 #define CUDA_SCENE_CUH
 
 #include "cuda_Base.cuh"
-
+#include<curand_kernel.h>
 #include<vector>
 class SphereObj;
 class PHO_ViewPort;
@@ -71,6 +71,7 @@ public:
 	Cuda_Material *m_Dev_Mat;
 	Cuda_TracerSet *m_Host_Tracer;
 	Cuda_TracerSet *m_Dev_Tracer;
+	curandState *m_Dev_Randstate;
 
 	~Cuda_Scene();
 	void SetCudaSceneMat(std::vector<GL_Material*>&);
